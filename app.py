@@ -52,7 +52,6 @@ firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 DIRECTION_DESCENDING = firestore.Query.DESCENDING
-PAGE_SIZE = 20
 
 @app.route('/')
 def index():
