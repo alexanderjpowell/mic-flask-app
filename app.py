@@ -3,7 +3,7 @@
 # python3 app.py
 # 
 
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, redirect, url_for, jsonify, session#, g
 from flask_login import LoginManager, login_required, login_user, logout_user
 import firebase_admin
 from firebase_admin import credentials, firestore
@@ -13,7 +13,6 @@ import pyrebase
 
 app = Flask(__name__)
 
-#app.secret_key = 'keep-this-secret'
 #login_manager = LoginManager()
 #login_manager.init_app(app)
 
@@ -21,8 +20,9 @@ DEBUG = False
 
 if (DEBUG):
 	import config
-	serviceAccountKey = config.serviceAccountKeyDebug
-	config_pyrebase = config.config_pyrebase_debug
+	serviceAccountKey = config.serviceAccountKey
+	config_pyrebase = config.config_pyrebase
+	app.secret_key = config.flask_secret_key
 else:
 	serviceAccountKey = {
 		"type": "service_account",
@@ -43,6 +43,8 @@ else:
 		"databaseURL": "https://meter-image-capturing.firebaseio.com",
 		"storageBucket": "meter-image-capturing.appspot.com"
 	}
+
+	app.secret_key = os.environ["flask_secret_key"]
 	#import config
 	#serviceAccountKey = config.serviceAccountKey
 	#config_pyrebase = config.config_pyrebase
@@ -76,43 +78,31 @@ db = firestore.client()
 
 DIRECTION_DESCENDING = firestore.Query.DESCENDING
 PAGE_SIZE = 20
-data = []
-LAST_DOCUMENT_SNAPSHOT = None
-UID = None
+#data = []
+#LAST_DOCUMENT_SNAPSHOT = None
+#UID = None
 #UID = 'qEqNIQlYEONuG8EMg3IFatXRpIJ2'
 #UID = 'xgdRnVu3yrgjEhrMQgDSImBEOCc2'
-count = 1
 
 #user = None
 
 @app.route('/')
 def index():
-	global UID
-	global data
-	global LAST_DOCUMENT_SNAPSHOT
-	#global user
-
-	#user = User('qEqNIQlYEONuG8EMg3IFatXRpIJ2')
-	
-	if (UID == None):
+	if ('UID' not in session):
 		return redirect(url_for('signin'))
 	else:
 		return render_template('index.html')
 
 @app.route('/signin', methods=["GET", "POST"])
 def signin():
-	global UID
-
-	if (UID == None):
+	if ('UID' not in session):
 		return render_template('signin.html')
 	else:
 		return redirect(url_for('index'))
 
 @app.route('/account')
 def account():
-	global UID
-
-	if (UID == None):
+	if ('UID' not in session):
 		return redirect(url_for('signin'))
 	else:
 		return render_template('account.html', uid=UID)
@@ -120,7 +110,7 @@ def account():
 # Get Firebase Auth UID
 @app.route('/_route_to_api', methods = ['POST'])
 def api():
-	global UID
+	session.pop('UID', None)
 
 	if request.method == 'POST':
 		email = request.form['email']
@@ -132,52 +122,54 @@ def api():
 			user = auth.sign_in_with_email_and_password(email, password)
 			localId = user['localId']
 			if (localId != request.form['uid']) or (request.form['uid'] == ''):
-				UID = None
+				session.pop('UID', None)
 			else:
-				UID = request.form['uid']
+				session['UID'] = localId
 			return 'OK', 200
 		except: #requests.exceptions.HTTPError
-			UID = None
+			session.pop('UID', None)
 			return 'OK', 200
 
 @app.route('/_logout', methods = ['POST'])
 def _logout():
-	global UID
-
 	if request.method == 'POST':
-		if request.form['uid'] == '':
-			UID = None
+		session.pop('UID', None)
 		return 'OK', 200
 
 @app.route('/api', methods = ['POST'])
 def apii():
-	#global user
-	if UID == None:
+	if ('UID' not in session) or ('startDate' not in session) or ('endDate' not in session):
 		return 'OK', 200
-	
+	data = []
+	ref = db.collection('scans')
+	UID = session['UID']
+	startDate = session['startDate']
+	endDate = session['endDate']
+	query = ref.where('uid', '==', UID).where('timestamp', '>=', startDate).where('timestamp', '<=', endDate).order_by('timestamp', direction=DIRECTION_DESCENDING).limit(5000)
+	docs = query.stream()
+	for doc in docs:
+		dictionary = doc.to_dict()
+		dictionary['timestamp'] = '{0:%I:%M%p %m/%d/%y}'.format(dictionary['timestamp'])
+		data.append(dictionary)
 	return _createReportString(data)
 
 @app.route('/_apiii', methods = ['POST'])
 def apiii():
-	global UID
-	global data
-	global LAST_DOCUMENT_SNAPSHOT
-	global count
-
-	if UID == None:
+	if ('UID' not in session):
 		return 'OK', 200
 
 	if request.method == 'POST':
+		UID = session['UID']
 		startDate = _parseDate(request.form['startDate'])
 		endDate = _parseDate(request.form['endDate'])
-		#LAST_DOCUMENT_SNAPSHOT = None
-		data.clear()
+		session['startDate'] = startDate
+		session['endDate'] = endDate
+		data = []
 		ref = db.collection('scans')
 		query = ref.where('uid', '==', UID).where('timestamp', '>=', startDate).where('timestamp', '<=', endDate).order_by('timestamp', direction=DIRECTION_DESCENDING).limit(5000)
 		docs = query.stream()
 		count = 1
 		for doc in docs:
-			LAST_DOCUMENT_SNAPSHOT = doc
 			dictionary = doc.to_dict()
 			dictionary['timestamp'] = '{0:%I:%M%p %m/%d/%y}'.format(dictionary['timestamp'])
 			dictionary['index'] = count
@@ -250,16 +242,17 @@ def _parseDate(date):
 
 	return datetime.datetime(year, month, day, hour=hour, minute=minute)
 
-'''@login_manager.user_loader
-def load_user(userid):
-	return User(userid)'''
+'''@app.before_request
+def before_request():
+	if not 'EMAIL' in session:
+		return redirect(url_for('signin'))'''
 
 if __name__ == '__main__':
 	
 	HOST = '127.0.0.1'
 	PORT = 5000
-	USE_RELOADER = True
-	app.run(host=HOST, port=PORT, debug=DEBUG, use_reloader=USE_RELOADER)
+	THREADED = True
+	app.run(host=HOST, port=PORT, debug=DEBUG)
 
 	'''sample = { 'machine_id': '12345678', 
 		'progressive_1': '123.45', 
