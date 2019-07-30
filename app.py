@@ -105,7 +105,7 @@ def account():
 	if ('UID' not in session):
 		return redirect(url_for('signin'))
 	else:
-		return render_template('account.html', uid=UID)
+		return render_template('account.html', uid=session['UID'])
 
 # Get Firebase Auth UID
 @app.route('/_route_to_api', methods = ['POST'])
