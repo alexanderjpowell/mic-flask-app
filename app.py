@@ -28,7 +28,7 @@ else:
 		"type": "service_account",
 		"project_id": "meter-image-capturing",
 		"private_key_id": os.environ["private_key_id"],
-		"private_key": os.environ["private_key"],
+		"private_key": os.environ["private_key"].replace('\\n', '\n'),
 		"client_email": "firebase-adminsdk-l3mxx@meter-image-capturing.iam.gserviceaccount.com",
 		"client_id": os.environ["client_id"],
 		"auth_uri": "https://accounts.google.com/o/oauth2/auth",
