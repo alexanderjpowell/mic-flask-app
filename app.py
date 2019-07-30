@@ -19,14 +19,33 @@ app = Flask(__name__)
 
 DEBUG = False
 
-if (False):
+if (DEBUG):
 	import config
 	serviceAccountKey = config.serviceAccountKeyDebug
 	config_pyrebase = config.config_pyrebase_debug
 else:
-	import config
-	serviceAccountKey = config.serviceAccountKey
-	config_pyrebase = config.config_pyrebase
+	serviceAccountKey = {
+		"type": "service_account",
+		"project_id": "meter-image-capturing",
+		"private_key_id": os.environ["private_key_id"],
+		"private_key": os.environ["private_key"],
+		"client_email": "firebase-adminsdk-l3mxx@meter-image-capturing.iam.gserviceaccount.com",
+		"client_id": os.environ["client_id"],
+		"auth_uri": "https://accounts.google.com/o/oauth2/auth",
+		"token_uri": "https://oauth2.googleapis.com/token",
+		"auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+		"client_x509_cert_url": os.environ["client_x509_cert_url"]
+	}
+
+	config_pyrebase = {
+		"apiKey": os.environ["apiKey"],
+		"authDomain": "meter-image-capturing.firebaseapp.com",
+		"databaseURL": "https://meter-image-capturing.firebaseio.com",
+		"storageBucket": "meter-image-capturing.appspot.com"
+	}
+	#import config
+	#serviceAccountKey = config.serviceAccountKey
+	#config_pyrebase = config.config_pyrebase
 	'''serviceAccountKey = {
 		"type": "service_account",
 		"project_id": os.environ["project_id"],
@@ -154,7 +173,7 @@ def apiii():
 		#LAST_DOCUMENT_SNAPSHOT = None
 		data.clear()
 		ref = db.collection('scans')
-		query = ref.where('uid', '==', UID).where('timestamp', '>=', startDate).where('timestamp', '<=', endDate).order_by('timestamp', direction=DIRECTION_DESCENDING)
+		query = ref.where('uid', '==', UID).where('timestamp', '>=', startDate).where('timestamp', '<=', endDate).order_by('timestamp', direction=DIRECTION_DESCENDING).limit(5000)
 		docs = query.stream()
 		count = 1
 		for doc in docs:
