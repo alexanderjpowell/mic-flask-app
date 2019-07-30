@@ -13,9 +13,6 @@ import pyrebase
 
 app = Flask(__name__)
 
-#login_manager = LoginManager()
-#login_manager.init_app(app)
-
 DEBUG = False
 
 if (DEBUG):
@@ -45,28 +42,6 @@ else:
 	}
 
 	app.secret_key = os.environ["flask_secret_key"]
-	#import config
-	#serviceAccountKey = config.serviceAccountKey
-	#config_pyrebase = config.config_pyrebase
-	'''serviceAccountKey = {
-		"type": "service_account",
-		"project_id": os.environ["project_id"],
-		"private_key_id": os.environ["private_key_id"],
-		"private_key": os.environ["private_key"].replace('\\n', '\n'),
-		"client_email": os.environ["client_email"],
-		"client_id": os.environ["client_id"],
-		"auth_uri": os.environ["auth_uri"],
-		"token_uri": os.environ["token_uri"],
-		"auth_provider_x509_cert_url": os.environ["auth_provider_x509_cert_url"],
-		"client_x509_cert_url": os.environ["client_x509_cert_url"],
-	}
-
-	config_pyrebase = {
-		"apiKey": os.environ['apiKey'],
-		"authDomain": os.environ['authDomain'],
-		"databaseURL": os.environ['databaseURL'],
-		"storageBucket": os.environ['storageBucket']
-	}'''
 
 # Pyrebase credentials
 firebase = pyrebase.initialize_app(config_pyrebase)
@@ -78,13 +53,6 @@ db = firestore.client()
 
 DIRECTION_DESCENDING = firestore.Query.DESCENDING
 PAGE_SIZE = 20
-#data = []
-#LAST_DOCUMENT_SNAPSHOT = None
-#UID = None
-#UID = 'qEqNIQlYEONuG8EMg3IFatXRpIJ2'
-#UID = 'xgdRnVu3yrgjEhrMQgDSImBEOCc2'
-
-#user = None
 
 @app.route('/')
 def index():
@@ -116,7 +84,7 @@ def api():
 		email = request.form['email']
 		password = request.form['password']
 
-		# Check if UID matches UID from pyrebase wrapper.  If not then set UID to None
+		# Check if UID matches UID from pyrebase wrapper.  If not then pop session['UID']
 		try:
 			auth = firebase.auth()
 			user = auth.sign_in_with_email_and_password(email, password)
@@ -177,25 +145,6 @@ def apiii():
 			count += 1
 		return jsonify(data)
 
-'''@app.route('/_fetch_more_records', methods = ['POST'])
-def _fetch_more_records():
-	global LAST_DOCUMENT_SNAPSHOT
-	global count
-	
-	new_data = []
-	ref = db.collection('scans')
-	query = ref.where('uid', '==', UID).order_by('timestamp', direction=DIRECTION_DESCENDING).start_after(LAST_DOCUMENT_SNAPSHOT).limit(PAGE_SIZE)
-	docs = query.stream()
-	for doc in docs:
-		LAST_DOCUMENT_SNAPSHOT = doc
-		dictionary = doc.to_dict()
-		dictionary['timestamp'] = '{0:%I:%M%p %m/%d/%y}'.format(dictionary['timestamp'])
-		dictionary['index'] = count
-		data.append(dictionary)
-		new_data.append(dictionary)
-		count += 1
-	return jsonify(new_data)'''
-
 '''@app.route('/add_new_record', methods = ['POST'])
 def add_new_record():
 	if request.method == 'POST':
@@ -233,19 +182,14 @@ def _parseDate(date):
 	if am_pm == 'PM':
 		hour += 12
 
-	'''print("year: " + str(year))
-	print("month: " + str(month))
-	print("day: " + str(day))
-	print("am_pm: " + am_pm)
-	print("hour: " + str(hour))
-	print("minute: " + str(minute))'''
-
 	return datetime.datetime(year, month, day, hour=hour, minute=minute)
 
-'''@app.before_request
+'''
+@app.before_request
 def before_request():
 	if not 'EMAIL' in session:
-		return redirect(url_for('signin'))'''
+		return redirect(url_for('signin'))
+'''
 
 if __name__ == '__main__':
 	
