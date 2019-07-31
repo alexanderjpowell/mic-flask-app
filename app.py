@@ -182,12 +182,10 @@ def _parseDate(date):
 
 	return datetime.datetime(year, month, day, hour=hour, minute=minute)
 
-'''
-@app.before_request
+
+'''@app.before_request
 def before_request():
-	if not 'EMAIL' in session:
-		return redirect(url_for('signin'))
-'''
+	print(session)'''
 
 if __name__ == '__main__':
 	
