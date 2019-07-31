@@ -74,10 +74,6 @@ def account():
 	else:
 		return render_template('account.html', uid=session['UID'])
 
-@app.route('/fail')
-def fail():
-	return 1 / 0
-
 # Get Firebase Auth UID
 @app.route('/_route_to_api', methods = ['POST'])
 def api():
