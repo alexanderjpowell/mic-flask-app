@@ -18,6 +18,22 @@ const textEmail = document.getElementById("textEmail");
 const textPassword = document.getElementById("textPassword");
 const btnLogin = document.getElementById("btnLogin");
 
+// Trigger login button press on enter key
+textEmail.addEventListener("keyup", function(event) {
+	if (event.keyCode === 13) {
+		event.preventDefault();
+		document.getElementById("btnLogin").click();
+	}
+});
+
+textPassword.addEventListener("keyup", function(event) {
+	if (event.keyCode === 13) {
+		event.preventDefault();
+		document.getElementById("btnLogin").click();
+	}
+});
+//
+
 btnLogin.addEventListener("click", e => {
 	NProgress.start();
 	const email = textEmail.value;
