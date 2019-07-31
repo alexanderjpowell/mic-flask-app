@@ -13,7 +13,7 @@ import pyrebase
 
 app = Flask(__name__)
 
-DEBUG = True
+DEBUG = False
 
 if (DEBUG):
 	import config
@@ -159,14 +159,13 @@ def add_new_record():
 		return redirect(url_for('index'))'''
 
 def _createReportString(scans):
-	ret = "'machine_id', 'progressive_1', 'progressive_2', 'progressive_3', 'progressive_4',"
-	ret += " 'progressive_5', 'progressive_6', 'notes', 'timestamp', 'user'\n"
+	ret = '"Machine","Progressive1","Progressive2","Progressive3","Progressive4","Progressive5","Progressive6","Notes","Date","User"\n'
 	for scan in scans:
-		ret += "'" + str(scan['machine_id']) + "', '" + str(scan['progressive1']) + "', '" 
-		ret += str(scan['progressive2']) + "', '" + str(scan['progressive3']) + "', '" 
-		ret += str(scan['progressive4']) + "', '" + str(scan['progressive5']) + "', '" 
-		ret += str(scan['progressive6']) + "', '" + str(scan['notes']) + "', '" + str(scan['timestamp']) 
-		ret += "', '" + str(scan['userName']) + "'\n"
+		ret += '"' + str(scan['machine_id']) + '","' + str(scan['progressive1']) + '","' 
+		ret += str(scan['progressive2']) + '","' + str(scan['progressive3']) + '","' 
+		ret += str(scan['progressive4']) + '","' + str(scan['progressive5']) + '","' 
+		ret += str(scan['progressive6']) + '","' + str(scan['notes']) + '","' + str(scan['timestamp']) 
+		ret += '","' + str(scan['userName']) + '"\n'
 	return ret
 
 def _parseDate(date):
