@@ -164,7 +164,7 @@ function insertRow(index, machine_id, progressive_1, progressive_2, progressive_
 function sendDateToServer(startDate, endDate) {
 	NProgress.start();
 	var url = "/_apiii";
-	var data = { 'startDate' : startDate, 'endDate' : endDate };
+	var data = { 'startDate' : startDate, 'endDate' : endDate, 'timeZoneOffset' : getTimeZoneOffset() };
 	$("#tableBody").empty();
 	$.post(url, data, function(dataa) {
 		for (var i = 0; i < dataa.length; i++) {
@@ -193,6 +193,11 @@ function toggleEmptyState(isEmpty) {
 		dataTableDiv.style.display = "block";
 		emptyStateDiv.style.display = "none";
 	}
+}
+
+function getTimeZoneOffset() {
+	var d = new Date();
+	return d.getTimezoneOffset() / 60;
 }
 
 /*$(window).scroll(function() {

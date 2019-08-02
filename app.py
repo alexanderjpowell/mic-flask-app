@@ -1,5 +1,6 @@
 #
 # To run:
+# source env/bin/activate (if using local virtual environment)
 # python3 app.py
 # 
 
@@ -13,7 +14,7 @@ import pyrebase
 
 app = Flask(__name__)
 
-DEBUG = True
+DEBUG = False
 
 if (DEBUG):
 	import config
@@ -105,17 +106,19 @@ def _logout():
 
 @app.route('/api', methods = ['POST'])
 def apii():
-	if ('UID' not in session) or ('startDate' not in session) or ('endDate' not in session):
+	if ('UID' not in session) or ('startDate' not in session) or ('endDate' not in session) or ('timeZoneOffset' not in session):
 		return 'OK', 200
 	data = []
 	ref = db.collection('scans')
 	UID = session['UID']
 	startDate = session['startDate']
 	endDate = session['endDate']
+	offset = session['timeZoneOffset']
 	query = ref.where('uid', '==', UID).where('timestamp', '>=', startDate).where('timestamp', '<=', endDate).order_by('timestamp', direction=DIRECTION_DESCENDING).limit(5000)
 	docs = query.stream()
 	for doc in docs:
 		dictionary = doc.to_dict()
+		dictionary['timestamp'] = _convertDateToLocal(dictionary['timestamp'], offset)
 		dictionary['timestamp'] = '{0:%I:%M%p %m/%d/%y}'.format(dictionary['timestamp'])
 		data.append(dictionary)
 	return _createReportString(data)
@@ -129,8 +132,10 @@ def apiii():
 		UID = session['UID']
 		startDate = _parseDate(request.form['startDate'])
 		endDate = _parseDate(request.form['endDate'])
+		offset = int(request.form['timeZoneOffset'])
 		session['startDate'] = startDate
 		session['endDate'] = endDate
+		session['timeZoneOffset'] = offset
 		data = []
 		ref = db.collection('scans')
 		query = ref.where('uid', '==', UID).where('timestamp', '>=', startDate).where('timestamp', '<=', endDate).order_by('timestamp', direction=DIRECTION_DESCENDING).limit(5000)
@@ -138,6 +143,7 @@ def apiii():
 		count = 1
 		for doc in docs:
 			dictionary = doc.to_dict()
+			dictionary['timestamp'] = _convertDateToLocal(dictionary['timestamp'], offset)
 			dictionary['timestamp'] = '{0:%I:%M%p %m/%d/%y}'.format(dictionary['timestamp'])
 			dictionary['index'] = count
 			data.append(dictionary)
@@ -157,6 +163,17 @@ def add_new_record():
 			print(sys.exc_info()[0], ' occured.')
 			db.collection('scans').add(result)
 		return redirect(url_for('index'))'''
+
+
+# Date is of type 'DatetimeWithNanoseconds'
+def _convertDateToLocal(date, offset):
+	year = date.year
+	month = date.month
+	day = date.day
+	hour = date.hour - offset
+	minute = date.minute
+	second = date.second
+	return google.api_core.datetime_helpers.DatetimeWithNanoseconds(year, month, day, hour, minute, second)
 
 def _createReportString(scans):
 	ret = '"Machine","Progressive1","Progressive2","Progressive3","Progressive4","Progressive5","Progressive6","Notes","Date","User"\n'
