@@ -198,8 +198,7 @@ def _parseDate(date, offset):
 	print('hour: ' + str(hour))
 	print('minute: ' + str(minute))
 	print('\n')'''
-
-	#return google.api_core.datetime_helpers.DatetimeWithNanoseconds(year, month, day, hour, minute)
+	
 	ret = datetime.datetime(year, month, day, hour=hour, minute=minute)
 	return ret + datetime.timedelta(hours=offset)
 
