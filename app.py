@@ -14,7 +14,7 @@ import pyrebase
 
 app = Flask(__name__)
 
-DEBUG = False
+DEBUG = True
 
 if (DEBUG):
 	import config
