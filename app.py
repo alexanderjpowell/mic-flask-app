@@ -130,9 +130,9 @@ def apiii():
 
 	if request.method == 'POST':
 		UID = session['UID']
-		startDate = _parseDate(request.form['startDate'])
-		endDate = _parseDate(request.form['endDate'])
 		offset = int(request.form['timeZoneOffset'])
+		startDate = _parseDate(request.form['startDate'], offset)
+		endDate = _parseDate(request.form['endDate'], offset)
 		session['startDate'] = startDate
 		session['endDate'] = endDate
 		session['timeZoneOffset'] = offset
@@ -175,6 +175,32 @@ def _convertDateToLocal(date, offset):
 	second = date.second
 	return google.api_core.datetime_helpers.DatetimeWithNanoseconds(year, month, day, hour, minute, second)
 
+def _parseDate(date, offset):
+	# date format: '2019-07-31:12:59:PM'
+	#			   '2019-08-07:12:00:AM'
+	year = int(date[0:4])
+	month = int(date[5:7])
+	day = int(date[8:10])
+	am_pm = date[17:19]
+	hour = int(date[11:13])# - 1 - offset# - offset #Subtract 1 or not?
+	minute = int(date[14:16])
+	am_pm = date[17:19]
+	if ((am_pm == 'AM') and (hour == 12)):
+		hour = 0
+	elif ((am_pm == 'PM') and (hour != 12)):
+		hour += 12
+
+	'''print('\n')
+	print('date: ' + date)
+	print('year: ' + str(year))
+	print('month: ' + str(month))
+	print('day: ' + str(day))
+	print('hour: ' + str(hour))
+	print('minute: ' + str(minute))'''
+	#return google.api_core.datetime_helpers.DatetimeWithNanoseconds(year, month, day, hour, minute)
+	ret = datetime.datetime(year, month, day, hour=hour, minute=minute)
+	return ret + datetime.timedelta(hours=offset)
+
 def _createReportString(scans):
 	ret = '"Machine","Progressive1","Progressive2","Progressive3","Progressive4","Progressive5","Progressive6","Notes","Date","User"\n'
 	for scan in scans:
@@ -184,25 +210,6 @@ def _createReportString(scans):
 		ret += str(scan['progressive6']) + '","' + str(scan['notes']) + '","' + str(scan['timestamp']) 
 		ret += '","' + str(scan['userName']) + '"\n'
 	return ret
-
-def _parseDate(date):
-	# date format: '2019-07-31:12:59:PM'
-	year = int(date[0:4])
-	month = int(date[5:7])
-	day = int(date[8:10])
-	am_pm = date[17:19]
-	hour = int(date[11:13]) - 1 #Subtract 1 or not?
-	minute = int(date[14:16])
-	am_pm = date[17:19]
-	if am_pm == 'PM':
-		hour += 12
-
-	return datetime.datetime(year, month, day, hour=hour, minute=minute)
-
-
-'''@app.before_request
-def before_request():
-	print(session)'''
 
 if __name__ == '__main__':
 	
