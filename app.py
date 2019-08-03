@@ -108,20 +108,11 @@ def _logout():
 def apii():
 	if ('UID' not in session) or ('startDate' not in session) or ('endDate' not in session) or ('timeZoneOffset' not in session):
 		return 'OK', 200
-	data = []
-	ref = db.collection('scans')
 	UID = session['UID']
+	offset = session['timeZoneOffset']
 	startDate = session['startDate']
 	endDate = session['endDate']
-	offset = session['timeZoneOffset']
-	query = ref.where('uid', '==', UID).where('timestamp', '>=', startDate).where('timestamp', '<=', endDate).order_by('timestamp', direction=DIRECTION_DESCENDING).limit(5000)
-	docs = query.stream()
-	for doc in docs:
-		dictionary = doc.to_dict()
-		dictionary['timestamp'] = _convertDateToLocal(dictionary['timestamp'], offset)
-		dictionary['timestamp'] = '{0:%I:%M%p %m/%d/%y}'.format(dictionary['timestamp'])
-		data.append(dictionary)
-	return _createReportString(data)
+	return _createReportString(_fetchRecordsFromDatabase(UID, offset, startDate, endDate))
 
 @app.route('/_apiii', methods = ['POST'])
 def apiii():
@@ -136,19 +127,22 @@ def apiii():
 		session['startDate'] = startDate
 		session['endDate'] = endDate
 		session['timeZoneOffset'] = offset
-		data = []
-		ref = db.collection('scans')
-		query = ref.where('uid', '==', UID).where('timestamp', '>=', startDate).where('timestamp', '<=', endDate).order_by('timestamp', direction=DIRECTION_DESCENDING).limit(5000)
-		docs = query.stream()
-		count = 1
-		for doc in docs:
-			dictionary = doc.to_dict()
-			dictionary['timestamp'] = _convertDateToLocal(dictionary['timestamp'], offset)
-			dictionary['timestamp'] = '{0:%I:%M%p %m/%d/%y}'.format(dictionary['timestamp'])
-			dictionary['index'] = count
-			data.append(dictionary)
-			count += 1
-		return jsonify(data)
+		return jsonify(_fetchRecordsFromDatabase(UID, offset, startDate, endDate))
+
+def _fetchRecordsFromDatabase(UID, offset, startDate, endDate):
+	data = []
+	ref = db.collection('scans')
+	query = ref.where('uid', '==', UID).where('timestamp', '>=', startDate).where('timestamp', '<=', endDate).order_by('timestamp', direction=DIRECTION_DESCENDING).limit(5000)
+	docs = query.stream()
+	count = 1
+	for doc in docs:
+		dictionary = doc.to_dict()
+		dictionary['timestamp'] = _convertDateToLocal(dictionary['timestamp'], offset)
+		dictionary['timestamp'] = '{0:%I:%M%p %m/%d/%y}'.format(dictionary['timestamp'])
+		dictionary['index'] = count
+		data.append(dictionary)
+		count += 1
+	return data
 
 '''@app.route('/add_new_record', methods = ['POST'])
 def add_new_record():
@@ -198,7 +192,7 @@ def _parseDate(date, offset):
 	print('hour: ' + str(hour))
 	print('minute: ' + str(minute))
 	print('\n')'''
-	
+
 	ret = datetime.datetime(year, month, day, hour=hour, minute=minute)
 	return ret + datetime.timedelta(hours=offset)
 
