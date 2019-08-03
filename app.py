@@ -14,7 +14,7 @@ import pyrebase
 
 app = Flask(__name__)
 
-DEBUG = True
+DEBUG = False
 
 if (DEBUG):
 	import config
@@ -173,7 +173,7 @@ def _convertDateToLocal(date, offset):
 	hour = date.hour - offset
 	minute = date.minute
 	second = date.second
-	return google.api_core.datetime_helpers.DatetimeWithNanoseconds(year, month, day, hour, minute, second)
+	return datetime.datetime(year, month, day, hour=hour, minute=minute, second=second)
 
 def _parseDate(date, offset):
 	# date format: '2019-07-31:12:59:PM'
@@ -196,7 +196,9 @@ def _parseDate(date, offset):
 	print('month: ' + str(month))
 	print('day: ' + str(day))
 	print('hour: ' + str(hour))
-	print('minute: ' + str(minute))'''
+	print('minute: ' + str(minute))
+	print('\n')'''
+
 	#return google.api_core.datetime_helpers.DatetimeWithNanoseconds(year, month, day, hour, minute)
 	ret = datetime.datetime(year, month, day, hour=hour, minute=minute)
 	return ret + datetime.timedelta(hours=offset)
