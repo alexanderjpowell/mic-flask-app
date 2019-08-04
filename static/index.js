@@ -195,6 +195,7 @@ function toggleEmptyState(isEmpty) {
 	}
 }
 
+//returns 4 in VA, 7 in Nevada
 function getTimeZoneOffset() {
 	var d = new Date();
 	return d.getTimezoneOffset() / 60;

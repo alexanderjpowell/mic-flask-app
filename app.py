@@ -4,7 +4,7 @@
 # python3 app.py
 # 
 
-from flask import Flask, render_template, request, redirect, url_for, jsonify, session#, g
+from flask import Flask, render_template, request, redirect, url_for, jsonify, session
 from flask_login import LoginManager, login_required, login_user, logout_user
 import firebase_admin
 from firebase_admin import credentials, firestore
@@ -167,6 +167,13 @@ def _convertDateToLocal(date, offset):
 	hour = date.hour - offset
 	minute = date.minute
 	second = date.second
+
+	#
+	if hour < 0:
+		hour = 0
+	if hour > 23:
+		hour = 23
+	#
 	return datetime.datetime(year, month, day, hour=hour, minute=minute, second=second)
 
 def _parseDate(date, offset):
@@ -176,7 +183,7 @@ def _parseDate(date, offset):
 	month = int(date[5:7])
 	day = int(date[8:10])
 	am_pm = date[17:19]
-	hour = int(date[11:13])# - 1 - offset# - offset #Subtract 1 or not?
+	hour = int(date[11:13])
 	minute = int(date[14:16])
 	am_pm = date[17:19]
 	if ((am_pm == 'AM') and (hour == 12)):
