@@ -59,6 +59,8 @@ def index():
 	if ('UID' not in session):
 		return redirect(url_for('signin'))
 	else:
+		session.pop('startDate', None)
+		session.pop('endDate', None)
 		return render_template('index.html')
 
 @app.route('/signin', methods=["GET", "POST"])
@@ -118,7 +120,6 @@ def apii():
 def apiii():
 	if ('UID' not in session):
 		return 'OK', 200
-
 	if request.method == 'POST':
 		UID = session['UID']
 		offset = int(request.form['timeZoneOffset'])
