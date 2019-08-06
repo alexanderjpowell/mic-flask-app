@@ -8,13 +8,16 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify, s
 from flask_login import LoginManager, login_required, login_user, logout_user
 import firebase_admin
 from firebase_admin import credentials, firestore
-import datetime, sys, math, os, google.api_core
+import sys, math, os, google.api_core
+from datetime import datetime, timedelta
 from user import User
 import pyrebase
 
 app = Flask(__name__)
 
 DEBUG = False
+
+#UID = 'xgdRnVu3yrgjEhrMQgDSImBEOCc2'
 
 if (DEBUG):
 	import config
@@ -165,17 +168,13 @@ def _convertDateToLocal(date, offset):
 	year = date.year
 	month = date.month
 	day = date.day
-	hour = date.hour - offset
+	hour = date.hour
 	minute = date.minute
 	second = date.second
 
-	#
-	if hour < 0: # previous day
-		hour = 0
-	if hour > 23: # next day
-		hour = 23
-	#
-	return datetime.datetime(year, month, day, hour=hour, minute=minute, second=second)
+	time = datetime(year, month, day, hour=hour, minute=minute, second=second)
+	delta = timedelta(hours=offset)
+	return time - delta
 
 def _parseDate(date, offset):
 	# date format: '2019-07-31:12:59:PM'
@@ -201,8 +200,9 @@ def _parseDate(date, offset):
 	print('minute: ' + str(minute))
 	print('\n')'''
 
-	ret = datetime.datetime(year, month, day, hour=hour, minute=minute)
-	return ret + datetime.timedelta(hours=offset)
+	time = datetime(year, month, day, hour=hour, minute=minute)
+	delta = timedelta(hours=offset)
+	return time + delta
 
 def _createReportString(scans):
 	ret = '"Machine","Progressive1","Progressive2","Progressive3","Progressive4","Progressive5","Progressive6","Notes","Date","User"\n'
