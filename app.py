@@ -5,12 +5,10 @@
 # 
 
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session
-from flask_login import LoginManager, login_required, login_user, logout_user
 import firebase_admin
 from firebase_admin import credentials, firestore
 import sys, math, os, google.api_core
 from datetime import datetime, timedelta
-from user import User
 import pyrebase
 
 app = Flask(__name__)
@@ -64,6 +62,7 @@ def index():
 	else:
 		session.pop('startDate', None)
 		session.pop('endDate', None)
+		session.pop('timeZoneOffset', None)
 		return render_template('index.html')
 
 @app.route('/signin', methods=["GET", "POST"])
