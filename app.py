@@ -13,7 +13,7 @@ import pyrebase
 
 app = Flask(__name__)
 
-DEBUG = False
+DEBUG = True
 
 #UID = 'xgdRnVu3yrgjEhrMQgDSImBEOCc2'
 
@@ -77,7 +77,7 @@ def account():
 	if ('UID' not in session):
 		return redirect(url_for('signin'))
 	else:
-		return render_template('account.html', uid=session['UID'])
+		return render_template('account.html', email=session['email'], name=session['displayName'])
 
 # Get Firebase Auth UID
 @app.route('/_route_to_api', methods = ['POST'])
@@ -97,6 +97,8 @@ def api():
 				session.pop('UID', None)
 			else:
 				session['UID'] = localId
+				session['email'] = user['email']
+				session['displayName'] = user['displayName']
 			return 'OK', 200
 		except: #requests.exceptions.HTTPError
 			session.pop('UID', None)
