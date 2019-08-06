@@ -170,9 +170,9 @@ def _convertDateToLocal(date, offset):
 	second = date.second
 
 	#
-	if hour < 0:
+	if hour < 0: # previous day
 		hour = 0
-	if hour > 23:
+	if hour > 23: # next day
 		hour = 23
 	#
 	return datetime.datetime(year, month, day, hour=hour, minute=minute, second=second)
