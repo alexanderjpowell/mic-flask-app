@@ -13,7 +13,7 @@ import pyrebase
 
 app = Flask(__name__)
 
-DEBUG = True
+DEBUG = False
 
 #UID = 'xgdRnVu3yrgjEhrMQgDSImBEOCc2'
 
@@ -179,7 +179,6 @@ def _convertDateToLocal(date, offset):
 
 def _parseDate(date, offset):
 	# date format: '2019-07-31:12:59:PM'
-	#			   '2019-08-07:12:00:AM'
 	year = int(date[0:4])
 	month = int(date[5:7])
 	day = int(date[8:10])
@@ -191,15 +190,6 @@ def _parseDate(date, offset):
 		hour = 0
 	elif ((am_pm == 'PM') and (hour != 12)):
 		hour += 12
-
-	'''print('\n')
-	print('date: ' + date)
-	print('year: ' + str(year))
-	print('month: ' + str(month))
-	print('day: ' + str(day))
-	print('hour: ' + str(hour))
-	print('minute: ' + str(minute))
-	print('\n')'''
 
 	time = datetime(year, month, day, hour=hour, minute=minute)
 	delta = timedelta(hours=offset)
@@ -221,23 +211,6 @@ if __name__ == '__main__':
 	PORT = 5000
 	THREADED = True
 	app.run(host=HOST, port=PORT, debug=DEBUG)
-
-	'''sample = { 'machine_id': '12345678', 
-		'progressive_1': '123.45', 
-		'progressive_2': '87.37', 
-		'progressive_3': '55.50', 
-		'progressive_4': '25.13', 
-		'progressive_5': '', 
-		'progressive_6': '', 
-		'timestamp': datetime.datetime.now(), 
-		'notes': '', 
-		'user': 'Alex', 
-		'uid': 'qEqNIQlYEONuG8EMg3IFatXRpIJ2'
-	}
-
-	for i in range(2):
-		print(i)
-		db.collection('scans').document().set(sample)'''
 
 
 
