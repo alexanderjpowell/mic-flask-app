@@ -72,6 +72,18 @@
 			<hr class="my-4">
 			<h5 id="emailText">Email: <a href="mailto:{{ email }}">{{ email }}</a></h5>
 			<h5 id="nameText">Name: {{ name }}</h5>
+			
+			<hr class="my-4">
+			<h3>Upload CSV Data</h3>
+
+			<form action="/upload" method="POST" enctype="multipart/form-data">
+				<div class="form-group">
+					<input type="file" name="file" class="form-control-file"/>
+					<br>
+					<input type="submit" class="btn btn-secondary"/>
+				</div>
+			</form>
+
 		</div>
 		{% endblock %}
 

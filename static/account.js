@@ -12,9 +12,21 @@ var firebaseConfig = {
     storageBucket: "meter-image-capturing.appspot.com",
 };
 
+const emailText = document.getElementById("emailText");
+const nameText = document.getElementById("nameText");
+
 firebase.initializeApp(firebaseConfig);
 
+var user = firebase.auth().currentUser;
 
+if (user != null) {
+	console.log('email ' + user.email)
+	console.log('displayName ' + user.displayName)
+	emailText.innerHTML = user.email;
+	nameText.innerHTML = user.displayName;
+} else {
+	console.log('user is null');
+}
 
 
 

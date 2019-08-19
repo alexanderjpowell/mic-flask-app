@@ -5,17 +5,20 @@
 # 
 
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session
+from werkzeug import secure_filename
 import firebase_admin
 from firebase_admin import credentials, firestore
-import sys, math, os, google.api_core
+import sys, math, os, google.api_core, csv
 from datetime import datetime, timedelta
 import pyrebase
 
+UPLOAD_FOLDER = os.getcwd() + '/files'
+ALLOWED_EXTENSIONS = {'csv'}
+
 app = Flask(__name__)
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
 DEBUG = False
-
-#UID = 'xgdRnVu3yrgjEhrMQgDSImBEOCc2'
 
 if (DEBUG):
 	import config
@@ -64,13 +67,15 @@ def index():
 		session.pop('endDate', None)
 		session.pop('timeZoneOffset', None)
 		return render_template('index.html')
+	#return render_template('index.html')
 
-@app.route('/signin', methods=["GET", "POST"])
+@app.route('/signin')#, methods=["GET", "POST"])
 def signin():
 	if ('UID' not in session):
 		return render_template('signin.html')
 	else:
 		return redirect(url_for('index'))
+	#return render_template('signin.html')
 
 @app.route('/account')
 def account():
@@ -134,10 +139,48 @@ def apiii():
 		session['timeZoneOffset'] = offset
 		return jsonify(_fetchRecordsFromDatabase(UID, offset, startDate, endDate))
 
+@app.route('/upload', methods = ['POST'])
+def upload_file():
+	if ('UID' not in session):
+		return 'OK', 200
+	if request.method == 'POST':
+		checkIfTempDirExists()
+
+		if 'file' not in request.files:
+			return render_template('account.html')
+		
+		f = request.files['file']
+		
+		if f.filename == '':
+			return render_template('account.html')
+		
+		if f and allowed_file(f.filename):
+			filename = secure_filename(f.filename)
+			f.save(os.path.join(UPLOAD_FOLDER, filename))
+
+			try:
+				file = open(UPLOAD_FOLDER + '/' + filename, 'r')
+				reader = csv.reader(file)
+				_processFile(reader)
+			except:
+				return '<h3>Error reading file: only .csv files accepted. <a href="/account">Try again</a></h3>', 400
+
+			file.close()
+			f.close()
+			os.remove(UPLOAD_FOLDER + '/' + f.filename)
+			return '<h3>File uploaded successfully. <a href="/">Go back to main page</a></h3>', 200
+
+		return '<h3>Error reading file: only .csv files accepted. <a href="/account">Try again</a></h3>', 400
+
+def checkIfTempDirExists():
+	if not os.path.exists(UPLOAD_FOLDER):
+		os.mkdir(UPLOAD_FOLDER)
+
 def _fetchRecordsFromDatabase(UID, offset, startDate, endDate):
 	data = []
 	ref = db.collection('scans')
-	query = ref.where('uid', '==', UID).where('timestamp', '>=', startDate).where('timestamp', '<=', endDate).order_by('timestamp', direction=DIRECTION_DESCENDING).limit(5000)
+	query = ref.where('uid', '==', UID).where('timestamp', '>=', startDate).where('timestamp', '<=', endDate) \
+		.order_by('timestamp', direction=DIRECTION_DESCENDING).limit(5000)
 	docs = query.stream()
 	count = 1
 	for doc in docs:
@@ -163,8 +206,11 @@ def add_new_record():
 			db.collection('scans').add(result)
 		return redirect(url_for('index'))'''
 
+'''@app.before_request
+def before_request():
+	if ('UID' not in session) and (request.endpoint != 'signin'):
+		return redirect(url_for('signin'))'''
 
-# Date is of type 'DatetimeWithNanoseconds'
 def _convertDateToLocal(date, offset):
 	year = date.year
 	month = date.month
@@ -205,14 +251,50 @@ def _createReportString(scans):
 		ret += '","' + str(scan['userName']) + '"\n'
 	return ret
 
+def _insertToDatabase(location, machine_id, description):
+	query = db.collection('formUploads/' + session['UID'] + '/uploadFormData')
+	data = {
+		'location' : location, 
+		'machine_id' : machine_id, 
+		'description' : description, 
+		'isCompleted' : False,
+		'timestamp' : firestore.SERVER_TIMESTAMP
+	}
+	query.document().set(data)
+
+def _processFile(lines):
+	# Delete existing collection, if necessary
+	coll_ref = db.collection('formUploads/' + session['UID'] + '/uploadFormData')
+	_delete_collection(coll_ref, 50)
+	# Check header
+	if {'location', 'machine_id', 'description'} != set(next(lines)):
+		raise Exception('Invalid file format', 400)
+	# Process remaining file contents
+	for line in lines:
+		location = line[0]
+		machine_id = line[1]
+		description = line[2]
+		_insertToDatabase(location, machine_id, description)
+
+def _delete_collection(coll_ref, batch_size):
+	docs = coll_ref.limit(batch_size).stream()
+	deleted = 0
+
+	for doc in docs:
+		doc.reference.delete()
+		deleted = deleted + 1
+
+	if deleted >= batch_size:
+		return _delete_collection(coll_ref, batch_size)
+
+def allowed_file(filename):
+	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 if __name__ == '__main__':
 	
 	HOST = '127.0.0.1'
 	PORT = 5000
-	THREADED = True
 	app.run(host=HOST, port=PORT, debug=DEBUG)
-
-
 
 
 
