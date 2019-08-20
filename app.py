@@ -167,7 +167,7 @@ def upload_file():
 
 			file.close()
 			f.close()
-			os.remove(UPLOAD_FOLDER + '/' + f.filename)
+			os.remove(UPLOAD_FOLDER + '/' + filename)
 			return '<h3>File uploaded successfully. <a href="/">Go back to main page</a></h3>', 200
 
 		return '<h3>Error reading file: only .csv files accepted. <a href="/account">Try again</a></h3>', 400
