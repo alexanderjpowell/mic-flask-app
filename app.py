@@ -8,7 +8,7 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify, s
 from werkzeug import secure_filename
 import firebase_admin
 from firebase_admin import credentials, firestore
-import sys, math, os, google.api_core, csv
+import sys, math, os, google.api_core, csv, string, random
 from datetime import datetime, timedelta
 import pyrebase
 
@@ -162,7 +162,8 @@ def upload_file():
 				file = open(UPLOAD_FOLDER + '/' + filename, 'r')
 				reader = csv.reader(file)
 				_processFile(reader)
-			except:
+			except Exception as ex:
+				#print(str(ex))
 				return '<h3>Error reading file: only .csv files accepted. <a href="/account">Try again</a></h3>', 400
 
 			file.close()
@@ -182,14 +183,15 @@ def _fetchRecordsFromDatabase(UID, offset, startDate, endDate):
 	query = ref.where('uid', '==', UID).where('timestamp', '>=', startDate).where('timestamp', '<=', endDate) \
 		.order_by('timestamp', direction=DIRECTION_DESCENDING).limit(5000)
 	docs = query.stream()
-	count = 1
+	index = 1
 	for doc in docs:
 		dictionary = doc.to_dict()
 		dictionary['timestamp'] = _convertDateToLocal(dictionary['timestamp'], offset)
-		dictionary['timestamp'] = '{0:%I:%M%p %m/%d/%y}'.format(dictionary['timestamp'])
-		dictionary['index'] = count
+		#dictionary['timestamp'] = '{0:%I:%M%p %m/%d/%y}'.format(dictionary['timestamp'])
+		dictionary['timestamp'] = str(dictionary['timestamp'])
+		dictionary['index'] = index
 		data.append(dictionary)
-		count += 1
+		index += 1
 	return data
 
 '''@app.route('/add_new_record', methods = ['POST'])
@@ -251,12 +253,14 @@ def _createReportString(scans):
 		ret += '","' + str(scan['userName']) + '"\n'
 	return ret
 
-def _insertToDatabase(location, machine_id, description):
+def _insertToDatabase(location, machine_id, description, number, user):
 	query = db.collection('formUploads/' + session['UID'] + '/uploadFormData')
 	data = {
 		'location' : location, 
 		'machine_id' : machine_id, 
 		'description' : description, 
+		'number' : number, 
+		'user' : user, 
 		'isCompleted' : False,
 		'timestamp' : firestore.SERVER_TIMESTAMP
 	}
@@ -267,14 +271,38 @@ def _processFile(lines):
 	coll_ref = db.collection('formUploads/' + session['UID'] + '/uploadFormData')
 	_delete_collection(coll_ref, 50)
 	# Check header
-	if {'location', 'machine_id', 'description'} != set(next(lines)):
-		raise Exception('Invalid file format', 400)
-	# Process remaining file contents
+	header = next(lines)
+	required_fields = {'location', 'machine_id', 'description'}
+	if not set(required_fields).issubset(header):
+		raise Exception('Missing required header field(s)', 400)
+
+	locationIndex = header.index('location')
+	machineIdIndex = header.index('machine_id')
+	descriptionIndex = header.index('description')
+	displayNames = _get_users()
+
 	for line in lines:
-		location = line[0]
-		machine_id = line[1]
-		description = line[2]
-		_insertToDatabase(location, machine_id, description)
+		location = line[locationIndex]
+		machine_id = line[machineIdIndex]
+		description = line[descriptionIndex]
+		if 'number' in header:
+			number = line[header.index('number')]
+		else:
+			number = None
+		
+		if len(displayNames):
+			user = random.sample(displayNames, 1)[0]
+		else: # no users on this account
+			user = None
+		_insertToDatabase(location, machine_id, description, number, user)
+
+def _get_users():
+	displayNamesRef = db.collection('users/' + session['UID'] + '/displayNames')
+	docs = displayNamesRef.stream()
+	sett = set()
+	for doc in docs:
+		sett.add(doc.get('displayName'))
+	return sett
 
 def _delete_collection(coll_ref, batch_size):
 	docs = coll_ref.limit(batch_size).stream()
