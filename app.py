@@ -18,7 +18,7 @@ ALLOWED_EXTENSIONS = {'csv'}
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
-DEBUG = False
+DEBUG = True
 
 if (DEBUG):
 	import config
@@ -139,10 +139,12 @@ def apiii():
 		session['timeZoneOffset'] = offset
 		return jsonify(_fetchRecordsFromDatabase(UID, offset, startDate, endDate))
 
-@app.route('/upload', methods = ['POST'])
+@app.route('/upload', methods = ['GET', 'POST'])
 def upload_file():
 	if ('UID' not in session):
 		return 'OK', 200
+	if request.method == 'GET':
+		return render_template('upload.html')
 	if request.method == 'POST':
 		checkIfTempDirExists()
 

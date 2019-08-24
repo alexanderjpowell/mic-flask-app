@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-		<title>My Account</title>
+		<title>Upload File</title>
 
 		<!-- Favicon -->
 		<link rel="apple-touch-icon-precomposed" sizes="57x57" href="static/images/favicomatic/apple-touch-icon-57x57.png" />
@@ -41,7 +41,7 @@
 		<link href="static/styles/sticky-footer.css" rel="stylesheet">
 	</head>
 	<body>
-
+		
 		<!-- Navigation bar -->
 		<nav class="navbar navbar-expand-lg navbar-light bg-light">
 			<a class="navbar-brand">
@@ -55,10 +55,10 @@
 					<li class="nav-item">
 						<a class="nav-link" href="/">Meter Image Capturing</a>
 					</li>
-					<li class="nav-item active">
+					<li class="nav-item">
 						<a class="nav-link" href="/account">My Account</a>
 					</li>
-					<li class="nav-item">
+					<li class="nav-item active">
 						<a class="nav-link" href="/upload">Upload</a>
 					</li>
 					<li class="nav-item">
@@ -69,16 +69,21 @@
 		</nav>
 		<!-- end nav bar -->
 
-		{% block content %}
+		<!-- Main page content -->
 		<div class="jumbotron">
-			<h1 class="display-6">Account Details</h1>
+			<h3>Upload CSV File</h3>
 			<hr class="my-4">
-			<h5 id="emailText">Email: <a href="mailto:{{ email }}">{{ email }}</a></h5>
-			<h5 id="nameText">Name: {{ name }}</h5>
-			
+			<p>MiC now supports CSV file uploads for easier management of progressive scans.<br>
+			To get started create a .csv file with the follow column headers:
+			<ul>
+				<li>location</li>
+				<li>machine_id</li>
+				<li>description</li>
+				<li>progressive_count (optional)</li>
+			</ul>
+			You can view a sample file <a href="file:///sample.csv">here</a>
+			</p>
 			<hr class="my-4">
-			<h3>Upload CSV Data</h3>
-
 			<form action="/upload" method="POST" enctype="multipart/form-data">
 				<div class="form-group">
 					<input type="file" name="file" class="form-control-file"/>
@@ -86,9 +91,8 @@
 					<input type="submit" class="btn btn-secondary"/>
 				</div>
 			</form>
-
 		</div>
-		{% endblock %}
+		<!-- -->
 
 		<!-- Footer -->
 		<footer class="footer">
@@ -107,4 +111,16 @@
 
 	</body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
 
