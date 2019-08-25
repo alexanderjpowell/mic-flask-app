@@ -4,7 +4,7 @@
 # python3 app.py
 # 
 
-from flask import Flask, render_template, request, redirect, url_for, jsonify, session
+from flask import Flask, render_template, request, redirect, url_for, jsonify, session, flash
 from werkzeug import secure_filename
 import firebase_admin
 from firebase_admin import credentials, firestore
@@ -18,7 +18,7 @@ ALLOWED_EXTENSIONS = {'csv'}
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
-DEBUG = True
+DEBUG = False
 
 if (DEBUG):
 	import config
@@ -166,14 +166,17 @@ def upload_file():
 				_processFile(reader)
 			except Exception as ex:
 				#print(str(ex))
-				return '<h3>Error reading file: only .csv files accepted. <a href="/account">Try again</a></h3>', 400
+				flash('Error reading file: only .csv files accepted. Try again.', 'error')
+				return render_template('upload.html')
 
 			file.close()
 			f.close()
 			os.remove(UPLOAD_FOLDER + '/' + filename)
-			return '<h3>File uploaded successfully. <a href="/">Go back to main page</a></h3>', 200
+			flash('File uploaded successfully!', 'success')
+			return render_template('upload.html')
 
-		return '<h3>Error reading file: only .csv files accepted. <a href="/account">Try again</a></h3>', 400
+		flash('Error reading file: only .csv files accepted. Try again.', 'error')
+		return render_template('upload.html')
 
 def checkIfTempDirExists():
 	if not os.path.exists(UPLOAD_FOLDER):
@@ -255,15 +258,15 @@ def _createReportString(scans):
 		ret += '","' + str(scan['userName']) + '"\n'
 	return ret
 
-def _insertToDatabase(location, machine_id, description, number, user):
+def _insertToDatabase(location, machine_id, description, progressive_count, user):
 	query = db.collection('formUploads/' + session['UID'] + '/uploadFormData')
 	data = {
 		'location' : location, 
 		'machine_id' : machine_id, 
 		'description' : description, 
-		'number' : number, 
+		'progressive_count' : progressive_count, 
 		'user' : user, 
-		'isCompleted' : False,
+		'completed' : False,
 		'timestamp' : firestore.SERVER_TIMESTAMP
 	}
 	query.document().set(data)
@@ -287,16 +290,16 @@ def _processFile(lines):
 		location = line[locationIndex]
 		machine_id = line[machineIdIndex]
 		description = line[descriptionIndex]
-		if 'number' in header:
-			number = line[header.index('number')]
+		if 'progressive_count' in header:
+			progressive_count = line[header.index('progressive_count')]
 		else:
-			number = None
+			progressive_count = None
 		
 		if len(displayNames):
 			user = random.sample(displayNames, 1)[0]
 		else: # no users on this account
 			user = None
-		_insertToDatabase(location, machine_id, description, number, user)
+		_insertToDatabase(location, machine_id, description, progressive_count, user)
 
 def _get_users():
 	displayNamesRef = db.collection('users/' + session['UID'] + '/displayNames')

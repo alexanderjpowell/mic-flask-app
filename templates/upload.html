@@ -71,17 +71,17 @@
 
 		<!-- Main page content -->
 		<div class="jumbotron">
-			<h3>Upload CSV File</h3>
+			<h2 class="display-6">Upload CSV File</h2>
 			<hr class="my-4">
 			<p>MiC now supports CSV file uploads for easier management of progressive scans.<br>
 			To get started create a .csv file with the follow column headers:
 			<ul>
-				<li>location</li>
-				<li>machine_id</li>
-				<li>description</li>
-				<li>progressive_count (optional)</li>
+				<li><b>location</b></li>
+				<li><b>machine_id</b> - no two rows in your .csv should include the same machine_id</li>
+				<li><b>description</b></li>
+				<li><b>progressive_count</b> (optional)</li>
 			</ul>
-			You can view a sample file <a href="file:///sample.csv">here</a>
+			You can view a sample file <a href="https://raw.githubusercontent.com/alexanderjpowell/mic-flask-app/master/sample.csv" target="_blank">here</a>.
 			</p>
 			<hr class="my-4">
 			<form action="/upload" method="POST" enctype="multipart/form-data">
@@ -91,6 +91,21 @@
 					<input type="submit" class="btn btn-secondary"/>
 				</div>
 			</form>
+			{% with messages = get_flashed_messages(with_categories=true) %}
+				{% if messages %}
+					{% for category, message in messages %}
+						{% if category == 'success' %}
+							<div class="alert alert-success" role="alert">
+								{{ message }}
+							</div>
+						{% elif category == 'error' %}
+							<div class="alert alert-danger" role="alert">
+								{{ message }}
+							</div>
+						{% endif %}
+					{% endfor %}
+				{% endif %}
+			{% endwith %}
 		</div>
 		<!-- -->
 
