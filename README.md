@@ -1,5 +1,13 @@
-# mic-flask-app
+## Meter Image Capturing Flask Web Portal ##
 
-![Empty state](https://raw.githubusercontent.com/alexanderjpowell/mic-flask-app/master/docs/screen_shot_empty.png)
-
-![Queried state](https://raw.githubusercontent.com/alexanderjpowell/mic-flask-app/master/docs/screen_shot_query.png)
+To check if dependencies are up to date:
+```
+// Ensure the virtual environment is activated:
+source env/bin/activate
+// List outdated pip dependencies
+pip list --outdated
+// Upgrade any out of date dependencies
+pip install --upgrade <dependency_name>
+// Finally, update requirements.txt
+pip freeze > requirements.txt
+```
