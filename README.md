@@ -1,6 +1,6 @@
 ## Meter Image Capturing Flask Web Portal ##
 
-To check if dependencies are up to date:
+To check if dependencies are up to date: 
 ```
 // Ensure the virtual environment is activated:
 source env/bin/activate
@@ -12,7 +12,7 @@ pip install --upgrade <dependency_name>
 pip freeze > requirements.txt
 ```
 
-To run in a development environment:
+To run in a development environment: 
 ```
 python3 app.py
 ```
