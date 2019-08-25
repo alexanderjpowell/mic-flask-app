@@ -11,3 +11,8 @@ pip install --upgrade <dependency_name>
 // Finally, update requirements.txt
 pip freeze > requirements.txt
 ```
+
+To run in a development environment:
+```
+python3 app.py
+```
