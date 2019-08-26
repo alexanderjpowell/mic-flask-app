@@ -18,7 +18,17 @@ const btnLogout = document.getElementById("btnLogout");
 const btnDownloadReport = document.getElementById("btnDownloadReport");
 const btnSubmitNewRecord = document.getElementById("btnSubmitNewRecord");
 //const btnLoadNewRecords = document.getElementById("btnLoadNewRecords");
-const progressive_1 = document.getElementById("progressive_1");
+
+const machine_id = document.getElementById("machine_id");
+const progressive1 = document.getElementById("progressive1");
+const progressive2 = document.getElementById("progressive2");
+const progressive3 = document.getElementById("progressive3");
+const progressive4 = document.getElementById("progressive4");
+const progressive5 = document.getElementById("progressive5");
+const progressive6 = document.getElementById("progressive6");
+const notes = document.getElementById("notes");
+const user = document.getElementById("userName");
+
 const dataTableDiv = document.getElementById("dataTableDiv");
 const emptyStateDiv = document.getElementById("emptyStateDiv");
 
@@ -53,8 +63,8 @@ btnSubmitNewRecord.addEventListener("click", e => {
 	var forms = document.getElementsByClassName("needs-validation");
 	var validation = Array.prototype.filter.call(forms, function(form) {
 		form.addEventListener("submit", function(event) {
-			if (form.checkValidity() === false) {
-				customValidation();
+			if ((form.checkValidity() === false)) {// or (customVal() ===  false)) {
+				//customValidation();
 				event.preventDefault();
 				event.stopPropagation();
 			}
@@ -90,6 +100,15 @@ function customValidation() {
 		return false;
 	} else {
 		console.log('valid');
+		return true;
+	}
+}
+
+function validate() {
+	// Check if progressives can be converted to float
+	if (isNaN(progressive1.innerHTML) || isNaN(progressive2.innerHTML) || isNaN(progressive3.innerHTML) || isNaN(progressive4.innerHTML) || isNaN(progressive5.innerHTML) || isNaN(progressive6.innerHTML)) {
+		return false;
+	} else {
 		return true;
 	}
 }

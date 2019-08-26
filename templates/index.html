@@ -92,7 +92,7 @@
 		</nav>
 		<!-- end nav bar -->
 
-		<!-- Modal -->
+		<!-- New Record Modal -->
 		<div id="myModal" class="modal fade" role="dialog">
 			<div class="modal-dialog">
 				<div class="modal-content">
@@ -100,10 +100,10 @@
 						<h4 class="modal-title">Add new record</h4>
 						<button type="button" class="close" data-dismiss="modal">&times;</button>
 					</div>
-					<form action="/add_new_record" method="post" class="needs-validation" novalidate>
+					<form action="/_add_new_record" method="post" class="needs-validation" novalidate>
 						<div class="modal-body">
 							<div class="input-group mb-3">
-								<input type="text" id="machine_id" name="machine_id" class="form-control" placeholder="Machine ID" required>
+								<input type="text" id="machine_id" name="machine_id" class="form-control" placeholder="Machine ID" maxlength="20" required>
 								<div class="invalid-feedback">Please enter a machine id</div>
 							</div>
 
@@ -111,7 +111,7 @@
 								<div class="input-group-prepend">
 									<span class="input-group-text">$</span>
 								</div>
-								<input type="text" id="progressive_1" name="progressive_1" class="form-control" placeholder="Progressive 1" required>
+								<input type="text" id="progressive1" name="progressive1" class="form-control" placeholder="Progressive 1" maxlength="10" required>
 								<div class="invalid-feedback">At least one progressive value is required</div>
 							</div>
 
@@ -119,39 +119,39 @@
 								<div class="input-group-prepend">
 									<span class="input-group-text">$</span>
 								</div>
-								<input type="text" id="progressive_2" name="progressive_2" class="form-control" placeholder="Progressive 2">
+								<input type="text" id="progressive2" name="progressive2" class="form-control" placeholder="Progressive 2" maxlength="10">
 							</div>
 
 							<div class="input-group mb-3">
 								<div class="input-group-prepend">
 									<span class="input-group-text">$</span>
 								</div>
-								<input type="text" id="progressive_3" name="progressive_3" class="form-control" placeholder="Progressive 3">
+								<input type="text" id="progressive3" name="progressive3" class="form-control" placeholder="Progressive 3" maxlength="10">
 							</div>
 
 							<div class="input-group mb-3">
 								<div class="input-group-prepend">
 									<span class="input-group-text">$</span>
 								</div>
-								<input type="text" id="progressive_4" name="progressive_4" class="form-control" placeholder="Progressive 4">
+								<input type="text" id="progressive4" name="progressive4" class="form-control" placeholder="Progressive 4" maxlength="10">
 							</div>
 
 							<div class="input-group mb-3">
 								<div class="input-group-prepend">
 									<span class="input-group-text">$</span>
 								</div>
-								<input type="text" id="progressive_5" name="progressive_5" class="form-control" placeholder="Progressive 5">
+								<input type="text" id="progressive5" name="progressive5" class="form-control" placeholder="Progressive 5" maxlength="10">
 							</div>
 
 							<div class="input-group mb-3">
 								<div class="input-group-prepend">
 									<span class="input-group-text">$</span>
 								</div>
-								<input type="text" id="progressive_6" name="progressive_6" class="form-control" placeholder="Progressive 6">
+								<input type="text" id="progressive6" name="progressive6" class="form-control" placeholder="Progressive 6" maxlength="10">
 							</div>
 
 							<div class="input-group mb-3">
-								<textarea id="notes" name="notes" class="form-control" placeholder="Notes"></textarea>
+								<textarea id="notes" name="notes" class="form-control" placeholder="Notes" maxlength="144"></textarea>
 							</div>
 
 							<!--<div class="input-group mb-3">
@@ -159,7 +159,7 @@
 							</div>-->
 
 							<div class="input-group mb-3">
-								<input type="text" id="user" name="user" class="form-control" placeholder="User" required>
+								<input type="text" id="userName" name="userName" class="form-control" placeholder="User" maxlength="20" required>
 								<div class="invalid-feedback">Please choose a username</div>
 							</div>
 						</div>
@@ -194,14 +194,13 @@
 				<tbody id="tableBody">
 				</tbody>
 			</table>
-			<!-- End data table -->
 			
 			<!-- Load more button -->
 			<!--<div id="divLoadNewRecords" style="padding:0 10px;">
 				<button id="btnLoadNewRecords" type="button" class="btn btn-outline-primary btn-lg btn-block">Load More Records</button>
 			</div>-->
 		</div>
-		<!-- -->
+		<!-- End data table -->
 
 		<!-- Empty State -->
 		<div id="emptyStateDiv" class="text-center" style="display: block;">

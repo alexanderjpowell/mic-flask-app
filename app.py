@@ -112,7 +112,7 @@ def api():
 @app.route('/_logout', methods = ['POST'])
 def _logout():
 	if request.method == 'POST':
-		session.pop('UID', None)
+		session.clear()
 		return 'OK', 200
 
 @app.route('/api', methods = ['POST'])
@@ -199,19 +199,24 @@ def _fetchRecordsFromDatabase(UID, offset, startDate, endDate):
 		index += 1
 	return data
 
-'''@app.route('/add_new_record', methods = ['POST'])
+'''@app.route('/_add_new_record', methods = ['POST'])
 def add_new_record():
+	if ('UID' not in session) or ('email' not in session):
+		return 'OK', 400
 	if request.method == 'POST':
-		print("add new record")
 		result = request.form.to_dict()
-		result['timestamp'] = datetime.datetime.now()
-		result['uid'] = UID
+		result['timestamp'] = firestore.SERVER_TIMESTAMP
+		result['uid'] = session['UID']
+		result['email'] = session['email']
+
 		try:
-			db.collection('scans').add(result)
+			print(result)
+			#db.collection('scans').add(result)
 		except google.api_core.exceptions.ServiceUnavailable:
 			print(sys.exc_info()[0], ' occured.')
-			db.collection('scans').add(result)
-		return redirect(url_for('index'))'''
+			#db.collection('scans').add(result)
+		return redirect(url_for('index'))
+		#return 'OK', 400'''
 
 '''@app.before_request
 def before_request():
@@ -294,11 +299,16 @@ def _processFile(lines):
 			progressive_count = line[header.index('progressive_count')]
 		else:
 			progressive_count = None
+
+		if 'user' in header:
+			user = line[header.index('user')]
+		else:
+			user = None
 		
-		if len(displayNames):
+		'''if len(displayNames):
 			user = random.sample(displayNames, 1)[0]
 		else: # no users on this account
-			user = None
+			user = None'''
 		_insertToDatabase(location, machine_id, description, progressive_count, user)
 
 def _get_users():
