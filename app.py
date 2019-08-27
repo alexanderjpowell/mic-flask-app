@@ -123,7 +123,7 @@ def apii():
 	offset = session['timeZoneOffset']
 	startDate = session['startDate']
 	endDate = session['endDate']
-	return _createReportString(_fetchRecordsFromDatabase(UID, offset, startDate, endDate))
+	return _create_report_string(_fetchRecordsFromDatabase(UID, offset, startDate, endDate))
 
 @app.route('/_apiii', methods = ['POST'])
 def apiii():
@@ -163,7 +163,7 @@ def upload_file():
 			try:
 				file = open(UPLOAD_FOLDER + '/' + filename, 'r')
 				reader = csv.reader(file)
-				_processFile(reader)
+				_process_file(reader)
 			except Exception as ex:
 				#print(str(ex))
 				flash('Error reading file: only .csv files accepted. Try again.', 'error')
@@ -199,7 +199,7 @@ def _fetchRecordsFromDatabase(UID, offset, startDate, endDate):
 		index += 1
 	return data
 
-'''@app.route('/_add_new_record', methods = ['POST'])
+@app.route('/_add_new_record', methods = ['POST'])
 def add_new_record():
 	if ('UID' not in session) or ('email' not in session):
 		return 'OK', 400
@@ -211,12 +211,12 @@ def add_new_record():
 
 		try:
 			print(result)
-			#db.collection('scans').add(result)
+			db.collection('scans').add(result)
 		except google.api_core.exceptions.ServiceUnavailable:
 			print(sys.exc_info()[0], ' occured.')
-			#db.collection('scans').add(result)
+			db.collection('scans').add(result)
 		return redirect(url_for('index'))
-		#return 'OK', 400'''
+		#return 'OK', 400
 
 '''@app.before_request
 def before_request():
@@ -253,7 +253,7 @@ def _parseDate(date, offset):
 	delta = timedelta(hours=offset)
 	return time + delta
 
-def _createReportString(scans):
+def _create_report_string(scans):
 	ret = '"Machine","Progressive1","Progressive2","Progressive3","Progressive4","Progressive5","Progressive6","Notes","Date","User"\n'
 	for scan in scans:
 		ret += '"' + str(scan['machine_id']) + '","' + str(scan['progressive1']) + '","' 
@@ -263,7 +263,7 @@ def _createReportString(scans):
 		ret += '","' + str(scan['userName']) + '"\n'
 	return ret
 
-def _insertToDatabase(location, machine_id, description, progressive_count, user):
+def _insert_to_database(location, machine_id, description, progressive_count, user):
 	query = db.collection('formUploads/' + session['UID'] + '/uploadFormData')
 	data = {
 		'location' : location, 
@@ -276,7 +276,7 @@ def _insertToDatabase(location, machine_id, description, progressive_count, user
 	}
 	query.document().set(data)
 
-def _processFile(lines):
+def _process_file(lines):
 	# Delete existing collection, if necessary
 	coll_ref = db.collection('formUploads/' + session['UID'] + '/uploadFormData')
 	_delete_collection(coll_ref, 50)
@@ -289,35 +289,32 @@ def _processFile(lines):
 	locationIndex = header.index('location')
 	machineIdIndex = header.index('machine_id')
 	descriptionIndex = header.index('description')
-	displayNames = _get_users()
 
 	for line in lines:
 		location = line[locationIndex]
 		machine_id = line[machineIdIndex]
 		description = line[descriptionIndex]
 		if 'progressive_count' in header:
-			progressive_count = line[header.index('progressive_count')]
+			contents = line[header.index('progressive_count')].strip()
+			progressive_count = contents if len(contents) > 0 else None
 		else:
 			progressive_count = None
 
 		if 'user' in header:
-			user = line[header.index('user')]
+			contents = line[header.index('user')].strip()
+			user = contents if len(contents) > 0 else None
 		else:
 			user = None
-		
-		'''if len(displayNames):
-			user = random.sample(displayNames, 1)[0]
-		else: # no users on this account
-			user = None'''
-		_insertToDatabase(location, machine_id, description, progressive_count, user)
 
-def _get_users():
+		_insert_to_database(location, machine_id, description, progressive_count, user)
+
+'''def _get_users():
 	displayNamesRef = db.collection('users/' + session['UID'] + '/displayNames')
 	docs = displayNamesRef.stream()
 	sett = set()
 	for doc in docs:
 		sett.add(doc.get('displayName'))
-	return sett
+	return sett'''
 
 def _delete_collection(coll_ref, batch_size):
 	docs = coll_ref.limit(batch_size).stream()

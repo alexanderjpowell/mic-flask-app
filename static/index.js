@@ -29,6 +29,8 @@ const progressive6 = document.getElementById("progressive6");
 const notes = document.getElementById("notes");
 const user = document.getElementById("userName");
 
+//const prog1 = document.getElementById("prog1");
+
 const dataTableDiv = document.getElementById("dataTableDiv");
 const emptyStateDiv = document.getElementById("emptyStateDiv");
 
@@ -63,12 +65,13 @@ btnSubmitNewRecord.addEventListener("click", e => {
 	var forms = document.getElementsByClassName("needs-validation");
 	var validation = Array.prototype.filter.call(forms, function(form) {
 		form.addEventListener("submit", function(event) {
-			if ((form.checkValidity() === false)) {// or (customVal() ===  false)) {
+			if ((form.checkValidity() === false)) {//(validate() === false)) {
+				//validate();
 				//customValidation();
 				event.preventDefault();
 				event.stopPropagation();
 			}
-			console.log(form);
+			//console.log(form);
 			form.classList.add('was-validated');
 		}, false);
 	});
@@ -94,7 +97,7 @@ btnSubmitNewRecord.addEventListener("click", e => {
 	});
 }, false);*/
 
-function customValidation() {
+/*function customValidation() {
 	if (progressive_1.value.includes('$')) {
 		console.log('invalid');
 		return false;
@@ -105,13 +108,19 @@ function customValidation() {
 }
 
 function validate() {
-	// Check if progressives can be converted to float
-	if (isNaN(progressive1.innerHTML) || isNaN(progressive2.innerHTML) || isNaN(progressive3.innerHTML) || isNaN(progressive4.innerHTML) || isNaN(progressive5.innerHTML) || isNaN(progressive6.innerHTML)) {
+	prog1.innerHTML = "TEST";
+	console.log("VALIDATE")
+	if (isNaN(progressive1.innerHTML) || 
+		isNaN(progressive2.innerHTML) || 
+		isNaN(progressive3.innerHTML) || 
+		isNaN(progressive4.innerHTML) || 
+		isNaN(progressive5.innerHTML) || 
+		isNaN(progressive6.innerHTML)) {
 		return false;
 	} else {
 		return true;
 	}
-}
+}*/
 
 function sendLogoutDataToServer(uid) {
 	var url = "/_logout";
