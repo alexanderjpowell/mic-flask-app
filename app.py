@@ -18,7 +18,7 @@ ALLOWED_EXTENSIONS = {'csv'}
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
-DEBUG = False
+DEBUG = True
 
 if (DEBUG):
 	import config
@@ -149,12 +149,12 @@ def upload_file():
 		checkIfTempDirExists()
 
 		if 'file' not in request.files:
-			return render_template('account.html')
+			return render_template('upload.html')
 		
 		f = request.files['file']
 		
 		if f.filename == '':
-			return render_template('account.html')
+			return render_template('upload.html')
 		
 		if f and allowed_file(f.filename):
 			filename = secure_filename(f.filename)
@@ -263,7 +263,7 @@ def _create_report_string(scans):
 		ret += '","' + str(scan['userName']) + '"\n'
 	return ret
 
-def _insert_to_database(location, machine_id, description, progressive_count, user):
+def _insert_to_database(location, machine_id, description, progressive_count, user, progressive_titles):
 	query = db.collection('formUploads/' + session['UID'] + '/uploadFormData')
 	data = {
 		'location' : location, 
@@ -271,6 +271,10 @@ def _insert_to_database(location, machine_id, description, progressive_count, us
 		'description' : description, 
 		'progressive_count' : progressive_count, 
 		'user' : user, 
+		'p_1' : progressive_titles[0], 
+		'p_2' : progressive_titles[1], 
+		'p_3' : progressive_titles[2], 
+		'p_4' : progressive_titles[3], 
 		'completed' : False,
 		'timestamp' : firestore.SERVER_TIMESTAMP
 	}
@@ -291,6 +295,8 @@ def _process_file(lines):
 	descriptionIndex = header.index('description')
 
 	for line in lines:
+		if len(line) == 0:
+			break
 		location = line[locationIndex]
 		machine_id = line[machineIdIndex]
 		description = line[descriptionIndex]
@@ -306,7 +312,24 @@ def _process_file(lines):
 		else:
 			user = None
 
-		_insert_to_database(location, machine_id, description, progressive_count, user)
+		if ('p_1' in header) and ('p_2' in header) and ('p_3' in header) and ('p_4' in header):
+			p_1 = line[header.index('p_1')].strip()
+			p_1 = p_1 if len(p_1) > 0 else None
+
+			p_2 = line[header.index('p_2')].strip()
+			p_2 = p_2 if len(p_2) > 0 else None
+
+			p_3 = line[header.index('p_3')].strip()
+			p_3 = p_3 if len(p_3) > 0 else None
+
+			p_4 = line[header.index('p_4')].strip()
+			p_4 = p_4 if len(p_4) > 0 else None
+
+			progressive_titles = [p_1, p_2, p_3, p_4]
+		else:
+			progressive_titles = [None, None, None, None]
+
+		_insert_to_database(location, machine_id, description, progressive_count, user, progressive_titles)
 
 '''def _get_users():
 	displayNamesRef = db.collection('users/' + session['UID'] + '/displayNames')
