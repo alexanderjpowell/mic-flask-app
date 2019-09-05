@@ -16,3 +16,8 @@ To run in a development environment:
 ```
 python3 app.py
 ```
+
+To run in a production environment on Heroku:
+```
+gunicorn wsgi:app
+```
