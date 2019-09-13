@@ -1,12 +1,12 @@
 asn1crypto==0.24.0
 CacheControl==0.12.5
 cachetools==3.1.1
-certifi==2019.6.16
+certifi==2019.9.11
 cffi==1.12.3
 chardet==3.0.4
 Click==7.0
 cryptography==2.7
-firebase-admin==2.18.0
+firebase-admin==3.0.0
 Flask==1.1.1
 Flask-Login==0.4.1
 gcloud==0.18.3
@@ -17,7 +17,7 @@ google-auth-httplib2==0.0.3
 google-cloud-core==1.0.3
 google-cloud-firestore==1.4.0
 google-cloud-storage==1.19.0
-google-resumable-media==0.3.3
+google-resumable-media==0.4.0
 googleapis-common-protos==1.6.0
 grpcio==1.23.0
 gunicorn==19.9.0
