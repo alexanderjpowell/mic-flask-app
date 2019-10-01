@@ -5,7 +5,8 @@
 # 
 
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session, flash
-from werkzeug import secure_filename
+#from werkzeug import secure_filename
+from werkzeug.utils import secure_filename
 import firebase_admin
 from firebase_admin import credentials, firestore
 import sys, math, os, google.api_core, csv, string, random
@@ -210,11 +211,27 @@ def add_new_record():
 		result['email'] = session['email']
 
 		try:
-			print(result)
-			db.collection('scans').add(result)
+			#print(result)
+			reference = db.collection('scans').add(result)
+
+			#
+			# First get the document id of the reference
+			result.pop('uid')
+			result.pop('email')
+			docId = reference[1].id
+			db.collection('users').document(session['UID']).collection('scans').add(result, docId)
+			#
 		except google.api_core.exceptions.ServiceUnavailable:
 			print(sys.exc_info()[0], ' occured.')
-			db.collection('scans').add(result)
+			reference = db.collection('scans').add(result)
+
+			#
+			# First get the document id of the reference
+			result.pop('uid')
+			result.pop('email')
+			docId = reference[1].id
+			db.collection('users').document(session['UID']).collection('scans').add(result, docId)
+			#
 		return redirect(url_for('index'))
 		#return 'OK', 400
 
