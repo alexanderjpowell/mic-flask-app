@@ -5,7 +5,6 @@
 # 
 
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session, flash
-#from werkzeug import secure_filename
 from werkzeug.utils import secure_filename
 import firebase_admin
 from firebase_admin import credentials, firestore
