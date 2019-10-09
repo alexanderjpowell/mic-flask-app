@@ -77,10 +77,26 @@
 							<input type="text" id="daterange" placeholder="Select a date range" class="form-control" autocomplete="off"/>
 						</div>
 					</li>
+					<!-- Drop down -->
+					<!--<li>
+						<div class="btn-group">
+							<button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								<span id="selected">Choose Casino</span>
+							</button>
+							<div class="dropdown-menu">
+								<a class="dropdown-item">Soboba</a>
+								<a class="dropdown-item">Caesar's</a>
+								<a class="dropdown-item">MGM</a>
+								<a class="dropdown-item">Mandalay Bay</a>
+								<a class="dropdown-item">Bellagio</a>
+								<div class="dropdown-divider"></div>
+								<a class="dropdown-item">Display All</a>
+							</div>
+						</div>
+					</li>-->
+					<!-- End Drop down -->
 					<li>
 						<button id="btnNewRecord" type="button" class="btn btn-primary btn-me" data-toggle="modal" data-toggle="tooltip" data-placement="bottom" title="Tooltip on bottom" data-target="#myModal">New Record</button>
-
-						<!--<button id="btnNewRecord" type="button" class="btn btn-primary btn-me disabled" data-toggle="tooltip" data-placement="bottom" title="Feature coming soon">New Record</button>-->
 					</li>
 					<li>
 						<button id="btnDownloadReport" type="button" class="btn">Download Report</button>
@@ -249,6 +265,12 @@
 			$(function () {
 				$('[data-toggle="tooltip"]').tooltip()
 			})
+
+			// Drop down functionality
+			/*$('.dropdown-menu a').click(function() {
+				$('#selected').text($(this).text());
+			});*/
+			//
 		</script>
 
 		<!-- Progress bar -->
