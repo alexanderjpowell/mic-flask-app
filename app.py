@@ -291,6 +291,8 @@ def _insert_to_database(location, machine_id, description, progressive_count, us
 		'p_2' : progressive_titles[1], 
 		'p_3' : progressive_titles[2], 
 		'p_4' : progressive_titles[3], 
+		'p_5' : progressive_titles[4], 
+		'p_6' : progressive_titles[5], 
 		'completed' : False,
 		'timestamp' : firestore.SERVER_TIMESTAMP
 	}
@@ -328,7 +330,7 @@ def _process_file(lines):
 		else:
 			user = None
 
-		if ('p_1' in header) and ('p_2' in header) and ('p_3' in header) and ('p_4' in header):
+		if ('p_1' in header) and ('p_2' in header) and ('p_3' in header) and ('p_4' in header) and ('p_5' in header) and ('p_6' in header):
 			p_1 = line[header.index('p_1')].strip()
 			p_1 = p_1 if len(p_1) > 0 else None
 
@@ -341,19 +343,17 @@ def _process_file(lines):
 			p_4 = line[header.index('p_4')].strip()
 			p_4 = p_4 if len(p_4) > 0 else None
 
-			progressive_titles = [p_1, p_2, p_3, p_4]
+			p_5 = line[header.index('p_5')].strip()
+			p_5 = p_5 if len(p_5) > 0 else None
+
+			p_6 = line[header.index('p_6')].strip()
+			p_6 = p_6 if len(p_6) > 0 else None
+
+			progressive_titles = [p_1, p_2, p_3, p_4, p_5, p_6]
 		else:
-			progressive_titles = [None, None, None, None]
+			progressive_titles = [None, None, None, None, None, None]
 
 		_insert_to_database(location, machine_id, description, progressive_count, user, progressive_titles)
-
-'''def _get_users():
-	displayNamesRef = db.collection('users/' + session['UID'] + '/displayNames')
-	docs = displayNamesRef.stream()
-	sett = set()
-	for doc in docs:
-		sett.add(doc.get('displayName'))
-	return sett'''
 
 def _delete_collection(coll_ref, batch_size):
 	docs = coll_ref.limit(batch_size).stream()
