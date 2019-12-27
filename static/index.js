@@ -26,6 +26,10 @@ const progressive3 = document.getElementById("progressive3");
 const progressive4 = document.getElementById("progressive4");
 const progressive5 = document.getElementById("progressive5");
 const progressive6 = document.getElementById("progressive6");
+const progressive7 = document.getElementById("progressive7");
+const progressive8 = document.getElementById("progressive8");
+const progressive9 = document.getElementById("progressive9");
+const progressive10 = document.getElementById("progressive10");
 const notes = document.getElementById("notes");
 const user = document.getElementById("userName");
 
@@ -150,7 +154,7 @@ $('.table > tbody > tr').click(function() {
 	console.log($(this).index());
 });
 
-function insertRow(index, machine_id, progressive_1, progressive_2, progressive_3, progressive_4, progressive_5, progressive_6, notes, timestamp, user) {
+function insertRow(index, machine_id, progressive_1, progressive_2, progressive_3, progressive_4, progressive_5, progressive_6, progressive_7, progressive_8, progressive_9, progressive_10, notes, timestamp, user) {
 	var index_row = '<th scope="row">' + index + '</th>';
 	var machine_id_row = "<td>" + machine_id + "</td>";
 	
@@ -172,6 +176,18 @@ function insertRow(index, machine_id, progressive_1, progressive_2, progressive_
 	if (typeof progressive_6 === 'undefined') {
 		progressive_6 = "";
 	}
+	if (typeof progressive_7 === 'undefined') {
+		progressive_7 = "";
+	}
+	if (typeof progressive_8 === 'undefined') {
+		progressive_8 = "";
+	}
+	if (typeof progressive_9 === 'undefined') {
+		progressive_9 = "";
+	}
+	if (typeof progressive_10 === 'undefined') {
+		progressive_10 = "";
+	}
 	if (typeof notes === 'undefined') {
 		notes = "";
 	}
@@ -182,10 +198,15 @@ function insertRow(index, machine_id, progressive_1, progressive_2, progressive_
 	var progressive_4_row = (progressive_4.trim() === "") ? "<td>-</td>" : "<td><font color='green'>$" + progressive_4 + "</font></td>";
 	var progressive_5_row = (progressive_5.trim() === "") ? "<td>-</td>" : "<td><font color='green'>$" + progressive_5 + "</font></td>";
 	var progressive_6_row = (progressive_6.trim() === "") ? "<td>-</td>" : "<td><font color='green'>$" + progressive_6 + "</font></td>";
+	var progressive_7_row = (progressive_7.trim() === "") ? "<td>-</td>" : "<td><font color='green'>$" + progressive_7 + "</font></td>";
+	var progressive_8_row = (progressive_8.trim() === "") ? "<td>-</td>" : "<td><font color='green'>$" + progressive_8 + "</font></td>";
+	var progressive_9_row = (progressive_9.trim() === "") ? "<td>-</td>" : "<td><font color='green'>$" + progressive_9 + "</font></td>";
+	var progressive_10_row = (progressive_10.trim() === "") ? "<td>-</td>" : "<td><font color='green'>$" + progressive_10 + "</font></td>";
+
 	var notes_row = (notes.trim() === "") ? "<td>-</td>" : "<td>" + notes + "</td>";
 	var timestamp_row = "<td>" + timestamp + "</td>";
 	var user_row = "<td>" + user + "</td>";
-	var row_html = "<tr>" + index_row + machine_id_row + progressive_1_row + progressive_2_row + progressive_3_row + progressive_4_row + progressive_5_row + progressive_6_row + notes_row + timestamp_row + user_row + "</tr>";
+	var row_html = "<tr>" + index_row + machine_id_row + progressive_1_row + progressive_2_row + progressive_3_row + progressive_4_row + progressive_5_row + progressive_6_row + progressive_7_row + progressive_8_row + progressive_9_row + progressive_10_row + notes_row + timestamp_row + user_row + "</tr>";
 	$(dataTable).find('tbody').append(row_html);
 }
 
@@ -204,6 +225,10 @@ function sendDateToServer(startDate, endDate) {
 				dataa[i].progressive4, 
 				dataa[i].progressive5, 
 				dataa[i].progressive6, 
+				dataa[i].progressive7, 
+				dataa[i].progressive8, 
+				dataa[i].progressive9, 
+				dataa[i].progressive10, 
 				dataa[i].notes, 
 				dataa[i].timestamp, 
 				dataa[i].userName);

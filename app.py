@@ -18,7 +18,7 @@ ALLOWED_EXTENSIONS = {'csv'}
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
-DEBUG = False
+DEBUG = True
 
 if (DEBUG):
 	import config
@@ -270,12 +270,12 @@ def _parseDate(date, offset):
 	return time + delta
 
 def _create_report_string(scans):
-	ret = '"Machine","Progressive1","Progressive2","Progressive3","Progressive4","Progressive5","Progressive6","Notes","Date","User"\n'
+	ret = '"Machine","Progressive1","Progressive2","Progressive3","Progressive4","Progressive5","Progressive6","Progressive7","Progressive8","Progressive9","Progressive10","Notes","Date","User"\n'
 	for scan in scans:
 		ret += '"' + str(scan['machine_id']) + '","' + str(scan['progressive1']) + '","' 
 		ret += str(scan['progressive2']) + '","' + str(scan['progressive3']) + '","' 
 		ret += str(scan['progressive4']) + '","' + str(scan['progressive5']) + '","' 
-		ret += str(scan['progressive6']) + '","' + str(scan['notes']) + '","' + str(scan['timestamp']) 
+		ret += str(scan['progressive6']) + '","' + str(scan['progressive7']) + '","' + str(scan['progressive8']) + '","' + str(scan['progressive9']) + '","' + str(scan['progressive10']) + '","' + str(scan['notes']) + '","' + str(scan['timestamp']) 
 		ret += '","' + str(scan['userName']) + '"\n'
 	return ret
 
@@ -293,6 +293,10 @@ def _insert_to_database(location, machine_id, description, progressive_count, us
 		'p_4' : progressive_titles[3], 
 		'p_5' : progressive_titles[4], 
 		'p_6' : progressive_titles[5], 
+		'p_7' : progressive_titles[6], 
+		'p_8' : progressive_titles[7], 
+		'p_9' : progressive_titles[8], 
+		'p_10' : progressive_titles[9], 
 		'completed' : False,
 		'timestamp' : firestore.SERVER_TIMESTAMP
 	}
@@ -330,7 +334,53 @@ def _process_file(lines):
 		else:
 			user = None
 
-		if ('p_1' in header) and ('p_2' in header) and ('p_3' in header) and ('p_4' in header) and ('p_5' in header) and ('p_6' in header):
+		###
+		p_1 = p_2 = p_3 = p_4 = p_5 = p_6 = p_7 = p_8 = p_9 = p_10 = None
+
+		if ('p_1' in header):
+			p_1 = line[header.index('p_1')].strip()
+			p_1 = p_1 if len(p_1) > 0 else None
+
+		if ('p_2' in header):
+			p_2 = line[header.index('p_2')].strip()
+			p_2 = p_2 if len(p_2) > 0 else None
+
+		if ('p_3' in header):
+			p_3 = line[header.index('p_3')].strip()
+			p_3 = p_3 if len(p_3) > 0 else None
+
+		if ('p_4' in header):
+			p_4 = line[header.index('p_4')].strip()
+			p_4 = p_4 if len(p_4) > 0 else None
+
+		if ('p_5' in header):
+			p_5 = line[header.index('p_5')].strip()
+			p_5 = p_5 if len(p_5) > 0 else None
+
+		if ('p_6' in header):
+			p_6 = line[header.index('p_6')].strip()
+			p_6 = p_6 if len(p_6) > 0 else None
+
+		if ('p_7' in header):
+			p_7 = line[header.index('p_7')].strip()
+			p_7 = p_7 if len(p_7) > 0 else None
+
+		if ('p_8' in header):
+			p_8 = line[header.index('p_8')].strip()
+			p_8 = p_8 if len(p_8) > 0 else None
+
+		if ('p_9' in header):
+			p_9 = line[header.index('p_9')].strip()
+			p_9 = p_9 if len(p_9) > 0 else None
+
+		if ('p_10' in header):
+			p_10 = line[header.index('p_10')].strip()
+			p_10 = p_10 if len(p_10) > 0 else None
+
+		progressive_titles = [p_1, p_2, p_3, p_4, p_5, p_6, p_7, p_8, p_9, p_10]
+		###
+
+		'''if ('p_1' in header) and ('p_2' in header) and ('p_3' in header) and ('p_4' in header) and ('p_5' in header) and ('p_6' in header) and ('p_7' in header) and ('p_8' in header) and ('p_9' in header) and ('p_10' in header):
 			p_1 = line[header.index('p_1')].strip()
 			p_1 = p_1 if len(p_1) > 0 else None
 
@@ -349,9 +399,21 @@ def _process_file(lines):
 			p_6 = line[header.index('p_6')].strip()
 			p_6 = p_6 if len(p_6) > 0 else None
 
-			progressive_titles = [p_1, p_2, p_3, p_4, p_5, p_6]
+			p_7 = line[header.index('p_7')].strip()
+			p_7 = p_7 if len(p_7) > 0 else None
+
+			p_8 = line[header.index('p_8')].strip()
+			p_8 = p_8 if len(p_8) > 0 else None
+
+			p_9 = line[header.index('p_9')].strip()
+			p_9 = p_9 if len(p_9) > 0 else None
+
+			p_10 = line[header.index('p_10')].strip()
+			p_10 = p_10 if len(p_10) > 0 else None
+
+			progressive_titles = [p_1, p_2, p_3, p_4, p_5, p_6, p_7, p_8, p_9, p_10]
 		else:
-			progressive_titles = [None, None, None, None, None, None]
+			progressive_titles = [None, None, None, None, None, None, None, None, None, None]'''
 
 		_insert_to_database(location, machine_id, description, progressive_count, user, progressive_titles)
 
