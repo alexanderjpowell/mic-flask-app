@@ -12,7 +12,7 @@ import sys, math, os, google.api_core, csv, string, random
 from datetime import datetime, timedelta
 import pyrebase
 
-UPLOAD_FOLDER = os.getcwd() + '/files' + '/'
+UPLOAD_FOLDER = os.getcwd() + '/files'# + '/'
 ALLOWED_EXTENSIONS = {'csv'}
 
 app = Flask(__name__)
@@ -158,10 +158,10 @@ def upload_file():
 		
 		if f and allowed_file(f.filename):
 			filename = secure_filename(f.filename)
-			f.save(os.path.join(UPLOAD_FOLDER + session['UID'], filename))
+			f.save(os.path.join(UPLOAD_FOLDER, filename)) # + session['UID']
 
 			try:
-				file = open(UPLOAD_FOLDER + session['UID'] + '/' + filename, 'r', encoding='utf8', errors='ignore')
+				file = open(UPLOAD_FOLDER + '/' + filename, 'r', encoding='utf8', errors='ignore')
 				reader = csv.reader(file)
 				_process_file(reader)
 			except Exception as ex:
@@ -171,7 +171,7 @@ def upload_file():
 
 			file.close()
 			f.close()
-			os.remove(UPLOAD_FOLDER + session['UID'] + '/' + filename)
+			os.remove(UPLOAD_FOLDER + '/' + filename)
 			flash('File uploaded successfully!', 'success')
 			return render_template('upload.html')
 
@@ -179,8 +179,8 @@ def upload_file():
 		return render_template('upload.html')
 
 def checkIfTempDirExists():
-	if not os.path.exists(UPLOAD_FOLDER + session['UID']):
-		os.mkdir(UPLOAD_FOLDER + session['UID'])
+	if not os.path.exists(UPLOAD_FOLDER):
+		os.mkdir(UPLOAD_FOLDER)
 
 def _fetchRecordsFromDatabase(UID, offset, startDate, endDate):
 	data = []
