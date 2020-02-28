@@ -18,7 +18,7 @@ ALLOWED_EXTENSIONS = {'csv'}
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 # Limits files to 16 megabytes
 
-DEBUG = True
+DEBUG = False
 
 if (DEBUG):
 	import config
