@@ -157,7 +157,7 @@ def upload_file():
 			return render_template('upload.html')
 		
 		if f and allowed_file(f.filename):
-			filename = secure_filename(f.filename)
+			filename = session['UID'] + '_' + secure_filename(f.filename)
 			f.save(os.path.join(UPLOAD_FOLDER, filename)) # + session['UID']
 
 			try:
