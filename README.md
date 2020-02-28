@@ -5,11 +5,11 @@ To check if dependencies are up to date:
 // Ensure the virtual environment is activated:
 source env/bin/activate
 // List outdated pip dependencies
-pip list --outdated
+pip3 list --outdated
 // Upgrade any out of date dependencies
-pip install --upgrade <dependency_name>
+pip3 install --upgrade <dependency_name>
 // Finally, update requirements.txt
-pip freeze > requirements.txt
+pip3 freeze > requirements.txt
 ```
 
 To run in a development environment: 

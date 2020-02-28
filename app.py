@@ -16,7 +16,7 @@ UPLOAD_FOLDER = os.getcwd() + '/files'
 ALLOWED_EXTENSIONS = {'csv'}
 
 app = Flask(__name__)
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 # Limits files to 16 megabytes
 
 DEBUG = False
 
@@ -161,12 +161,12 @@ def upload_file():
 			f.save(os.path.join(UPLOAD_FOLDER, filename))
 
 			try:
-				file = open(UPLOAD_FOLDER + '/' + filename, 'r')
+				file = open(UPLOAD_FOLDER + '/' + filename, 'r', encoding='utf8', errors='ignore')
 				reader = csv.reader(file)
 				_process_file(reader)
 			except Exception as ex:
 				#print(str(ex))
-				flash('Error reading file: only .csv files accepted. Try again.', 'error')
+				flash(str(ex), 'error')
 				return render_template('upload.html')
 
 			file.close()
@@ -316,9 +316,15 @@ def _process_file(lines):
 	machineIdIndex = header.index('machine_id')
 	descriptionIndex = header.index('description')
 
+	#print('length= ' + str(len(lines)))
+
 	for line in lines:
+
+		#print(line)
+
 		if len(line) == 0:
 			break
+
 		location = line[locationIndex]
 		machine_id = line[machineIdIndex]
 		description = line[descriptionIndex]
@@ -334,7 +340,6 @@ def _process_file(lines):
 		else:
 			user = None
 
-		###
 		p_1 = p_2 = p_3 = p_4 = p_5 = p_6 = p_7 = p_8 = p_9 = p_10 = None
 
 		if ('p_1' in header):
@@ -378,42 +383,6 @@ def _process_file(lines):
 			p_10 = p_10 if len(p_10) > 0 else None
 
 		progressive_titles = [p_1, p_2, p_3, p_4, p_5, p_6, p_7, p_8, p_9, p_10]
-		###
-
-		'''if ('p_1' in header) and ('p_2' in header) and ('p_3' in header) and ('p_4' in header) and ('p_5' in header) and ('p_6' in header) and ('p_7' in header) and ('p_8' in header) and ('p_9' in header) and ('p_10' in header):
-			p_1 = line[header.index('p_1')].strip()
-			p_1 = p_1 if len(p_1) > 0 else None
-
-			p_2 = line[header.index('p_2')].strip()
-			p_2 = p_2 if len(p_2) > 0 else None
-
-			p_3 = line[header.index('p_3')].strip()
-			p_3 = p_3 if len(p_3) > 0 else None
-
-			p_4 = line[header.index('p_4')].strip()
-			p_4 = p_4 if len(p_4) > 0 else None
-
-			p_5 = line[header.index('p_5')].strip()
-			p_5 = p_5 if len(p_5) > 0 else None
-
-			p_6 = line[header.index('p_6')].strip()
-			p_6 = p_6 if len(p_6) > 0 else None
-
-			p_7 = line[header.index('p_7')].strip()
-			p_7 = p_7 if len(p_7) > 0 else None
-
-			p_8 = line[header.index('p_8')].strip()
-			p_8 = p_8 if len(p_8) > 0 else None
-
-			p_9 = line[header.index('p_9')].strip()
-			p_9 = p_9 if len(p_9) > 0 else None
-
-			p_10 = line[header.index('p_10')].strip()
-			p_10 = p_10 if len(p_10) > 0 else None
-
-			progressive_titles = [p_1, p_2, p_3, p_4, p_5, p_6, p_7, p_8, p_9, p_10]
-		else:
-			progressive_titles = [None, None, None, None, None, None, None, None, None, None]'''
 
 		_insert_to_database(location, machine_id, description, progressive_count, user, progressive_titles)
 
