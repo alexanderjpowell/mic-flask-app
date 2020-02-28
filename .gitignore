@@ -1,3 +1,4 @@
 config.py
 env/*
 serviceAccountKey.json
+__pycache__/*
