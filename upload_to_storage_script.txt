@@ -1,0 +1,16 @@
+in bash:
+
+>export GOOGLE_APPLICATION_CREDENTIALS="serviceAccountKey.json"
+
+in python3 shell:
+
+>from google.cloud import storage
+>storage_client = storage.Client()
+>import firebase_admin
+>from firebase_admin import credentials
+>from firebase_admin import storage
+>bucket_name = "meter-image-capturing.appspot.com"
+>bucket = storage_client.bucket(bucket_name)
+>destination_blob_name = "<uid>.csv"
+>blob = bucket.blob(destination_blob_name)
+>blob.upload_from_filename("<uid>.csv")

@@ -11,8 +11,11 @@ from firebase_admin import credentials, firestore
 import sys, math, os, google.api_core, csv, string, random
 from datetime import datetime, timedelta
 import pyrebase
+from google.cloud import storage
+import json
 
 UPLOAD_FOLDER = os.getcwd() + '/files'# + '/'
+SERVICE_ACCOUNT_KEYS_FOLDER = os.getcwd() + '/service_account_keys'
 ALLOWED_EXTENSIONS = {'csv'}
 
 app = Flask(__name__)
@@ -141,12 +144,18 @@ def apiii():
 
 @app.route('/upload', methods = ['GET', 'POST'])
 def upload_file():
+	checkIfTempDirsExists()
+	#
+	credentialFileName = os.path.join(SERVICE_ACCOUNT_KEYS_FOLDER, session['UID'] + '.json')
+	credentialFile = open(credentialFileName, 'w+')
+	credentialFile.write(json.dumps(serviceAccountKey))
+	credentialFile.close()
+	#
 	if ('UID' not in session):
 		return 'OK', 200
 	if request.method == 'GET':
 		return render_template('upload.html')
 	if request.method == 'POST':
-		checkIfTempDirExists()
 
 		if 'file' not in request.files:
 			return render_template('upload.html')
@@ -157,19 +166,27 @@ def upload_file():
 			return render_template('upload.html')
 		
 		if f and allowed_file(f.filename):
-			filename = session['UID'] + '_' + secure_filename(f.filename)
-			f.save(os.path.join(UPLOAD_FOLDER, filename)) # + session['UID']
+			filename = secure_filename(f.filename)
+			f.save(os.path.join(UPLOAD_FOLDER, filename))
 
 			try:
-				file = open(UPLOAD_FOLDER + '/' + filename, 'r', encoding='utf8', errors='ignore')
-				reader = csv.reader(file)
-				_process_file(reader)
+				#
+				#
+				bucket_name = "meter-image-capturing.appspot.com"
+				storage_client = storage.Client.from_service_account_json(credentialFileName)
+				bucket = storage_client.bucket(bucket_name)
+				destination_blob_name = session['UID'] + '.csv'
+				blob = bucket.blob(destination_blob_name)
+				blob.upload_from_filename(os.path.join(UPLOAD_FOLDER, filename))
+				#file = open(UPLOAD_FOLDER + '/' + filename, 'r', encoding='utf8', errors='ignore')
+				#reader = csv.reader(file)
+				#_process_file(reader)
 			except Exception as ex:
-				#print(str(ex))
+				print(str(ex))
 				flash(str(ex), 'error')
 				return render_template('upload.html')
 
-			file.close()
+			#file.close()
 			f.close()
 			os.remove(UPLOAD_FOLDER + '/' + filename)
 			flash('File uploaded successfully!', 'success')
@@ -178,9 +195,11 @@ def upload_file():
 		flash('Error reading file: only .csv files accepted. Try again.', 'error')
 		return render_template('upload.html')
 
-def checkIfTempDirExists():
+def checkIfTempDirsExists():
 	if not os.path.exists(UPLOAD_FOLDER):
 		os.mkdir(UPLOAD_FOLDER)
+	if not os.path.exists(SERVICE_ACCOUNT_KEYS_FOLDER):
+		os.mkdir(SERVICE_ACCOUNT_KEYS_FOLDER)
 
 def _fetchRecordsFromDatabase(UID, offset, startDate, endDate):
 	data = []
@@ -279,8 +298,8 @@ def _create_report_string(scans):
 		ret += '","' + str(scan['userName']) + '"\n'
 	return ret
 
-def _insert_to_database(location, machine_id, description, progressive_count, user, progressive_titles):
-	query = db.collection('formUploads/' + session['UID'] + '/uploadFormData')
+def _insert_to_database(uid, location, machine_id, description, progressive_count, user, progressive_titles):
+	query = db.collection('formUploads/' + uid + '/uploadFormData')
 	data = {
 		'location' : location, 
 		'machine_id' : machine_id, 
@@ -302,9 +321,9 @@ def _insert_to_database(location, machine_id, description, progressive_count, us
 	}
 	query.document().set(data)
 
-def _process_file(lines):
+def _process_file(uid, lines):
 	# Delete existing collection, if necessary
-	coll_ref = db.collection('formUploads/' + session['UID'] + '/uploadFormData')
+	coll_ref = db.collection('formUploads/' + uid + '/uploadFormData')
 	_delete_collection(coll_ref, 50)
 	# Check header
 	header = next(lines)
@@ -384,7 +403,7 @@ def _process_file(lines):
 
 		progressive_titles = [p_1, p_2, p_3, p_4, p_5, p_6, p_7, p_8, p_9, p_10]
 
-		_insert_to_database(location, machine_id, description, progressive_count, user, progressive_titles)
+		_insert_to_database(uid, location, machine_id, description, progressive_count, user, progressive_titles)
 
 def _delete_collection(coll_ref, batch_size):
 	docs = coll_ref.limit(batch_size).stream()
@@ -399,6 +418,90 @@ def _delete_collection(coll_ref, batch_size):
 
 def allowed_file(filename):
 	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+'''class AsyncUploadTask(threading.Thread):
+
+	def __init__(self, uid, params):
+		threading.Thread.__init__(self)
+		self.uid = uid
+		self.params = params
+
+	def run(self):
+		#print('UID: ' + self.uid + ', Params: ' + self.params)
+
+		if not os.path.exists(UPLOAD_FOLDER):
+			os.mkdir(UPLOAD_FOLDER)
+
+		if 'file' not in self.params:
+			#return render_template('upload.html')
+			print('file not in request.files')
+			return
+		
+		f = self.params['file']
+		
+		if f.filename == '':
+			#return render_template('upload.html')
+			print('f.filename is empty')
+			return
+		
+		if f and allowed_file(f.filename):
+			filename = self.uid + '_' + secure_filename(f.filename)
+			print(UPLOAD_FOLDER)
+			print(filename)
+			f.save(os.path.join(UPLOAD_FOLDER, filename))
+
+			try:
+				file = open(UPLOAD_FOLDER + '/' + filename, 'r', encoding='utf8', errors='ignore')
+				reader = csv.reader(file)
+				_process_file(self.uid, reader)
+			except Exception as ex:
+				#flash(str(ex), 'error')
+				#return render_template('upload.html')
+				print(str(ex))
+				return
+
+			file.close()
+			f.close()
+			os.remove(UPLOAD_FOLDER + '/' + filename)
+			#flash('File uploaded successfully!', 'success')
+			#return render_template('upload.html')
+			return'''
+
+'''@copy_current_request_context
+def testUpload(uid, request_files):
+	if not os.path.exists(UPLOAD_FOLDER):
+			os.mkdir(UPLOAD_FOLDER)
+	
+	#f = request_files['file']
+	f = request_files
+	
+	if f.filename == '':
+		#return render_template('upload.html')
+		print('f.filename is empty')
+		return
+	
+	if f and allowed_file(f.filename):
+		filename = uid + '_' + secure_filename(f.filename)
+		print(UPLOAD_FOLDER)
+		print(filename)
+		f.save(os.path.join(UPLOAD_FOLDER, filename))
+
+		try:
+			file = open(UPLOAD_FOLDER + '/' + filename, 'r', encoding='utf8', errors='ignore')
+			reader = csv.reader(file)
+			_process_file(uid, reader)
+		except Exception as ex:
+			#flash(str(ex), 'error')
+			#return render_template('upload.html')
+			print(str(ex))
+			return
+
+		file.close()
+		f.close()
+		os.remove(UPLOAD_FOLDER + '/' + filename)
+		#flash('File uploaded successfully!', 'success')
+		#return render_template('upload.html')
+		return'''
 
 if __name__ == '__main__':
 	

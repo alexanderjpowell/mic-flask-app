@@ -12,7 +12,14 @@ pip3 install --upgrade <dependency_name>
 pip3 freeze > requirements.txt
 ```
 
-To run in a development environment: 
+To run in a development environment (remain in virtual env like above): 
+
+First set google cloud services environment variables in bash:
+```
+export GOOGLE_APPLICATION_CREDENTIALS="serviceAccountKey.json"
+```
+
+Then run the following in the Python shell:
 ```
 python3 app.py
 ```
