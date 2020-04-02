@@ -251,12 +251,6 @@ def add_new_record():
 			db.collection('users').document(session['UID']).collection('scans').add(result, docId)
 			#
 		return redirect(url_for('index'))
-		#return 'OK', 400
-
-'''@app.before_request
-def before_request():
-	if ('UID' not in session) and (request.endpoint != 'signin'):
-		return redirect(url_for('signin'))'''
 
 def _convertDateToLocal(date, offset):
 	year = date.year
@@ -289,13 +283,36 @@ def _parseDate(date, offset):
 	return time + delta
 
 def _create_report_string(scans):
-	ret = '"Machine","Progressive1","Progressive2","Progressive3","Progressive4","Progressive5","Progressive6","Progressive7","Progressive8","Progressive9","Progressive10","Notes","Date","User"\n'
+	ret = '"Machine","Progressive1","Progressive2","Progressive3","Progressive4","Progressive5","Progressive6","Progressive7","Progressive8","Progressive9","Progressive10","Notes","Date","User","Location"\n'
 	for scan in scans:
-		ret += '"' + str(scan['machine_id']) + '","' + str(scan['progressive1']) + '","' 
-		ret += str(scan['progressive2']) + '","' + str(scan['progressive3']) + '","' 
-		ret += str(scan['progressive4']) + '","' + str(scan['progressive5']) + '","' 
-		ret += str(scan['progressive6']) + '","' + str(scan['progressive7']) + '","' + str(scan['progressive8']) + '","' + str(scan['progressive9']) + '","' + str(scan['progressive10']) + '","' + str(scan['notes']) + '","' + str(scan['timestamp']) 
-		ret += '","' + str(scan['userName']) + '"\n'
+
+		machine_id = str(scan['machine_id']) if 'machine_id' in scan else ""
+		progressive1 = str(scan['progressive1']) if 'progressive1' in scan else ""
+		progressive2 = str(scan['progressive2']) if 'progressive2' in scan else ""
+		progressive3 = str(scan['progressive3']) if 'progressive3' in scan else ""
+		progressive4 = str(scan['progressive4']) if 'progressive4' in scan else ""
+		progressive5 = str(scan['progressive5']) if 'progressive5' in scan else ""
+		progressive6 = str(scan['progressive6']) if 'progressive6' in scan else ""
+		progressive7 = str(scan['progressive7']) if 'progressive7' in scan else ""
+		progressive8 = str(scan['progressive8']) if 'progressive8' in scan else ""
+		progressive9 = str(scan['progressive9']) if 'progressive9' in scan else ""
+		progressive10 = str(scan['progressive10']) if 'progressive10' in scan else ""
+		notes = str(scan['notes']) if 'notes' in scan else ""
+		timestamp = str(scan['timestamp']) if 'timestamp' in scan else ""
+		userName = str(scan['userName']) if 'userName' in scan else ""
+		location = str(scan['location']) if 'location' in scan else ""
+
+		ret += '"' + machine_id + '","' + progressive1 + '","' 
+		ret += progressive2 + '","' + progressive3 + '","' 
+		ret += progressive4 + '","' + progressive5 + '","' 
+		ret += progressive6 + '","' + progressive7 + '","' + progressive8 + '","' + progressive9 + '","' + progressive10 + '","' + notes + '","' + timestamp 
+		ret += '","' + userName + '","' + location + '"\n'
+
+		#ret += '"' + str(scan['machine_id']) + '","' + str(scan['progressive1']) + '","' 
+		#ret += str(scan['progressive2']) + '","' + str(scan['progressive3']) + '","' 
+		#ret += str(scan['progressive4']) + '","' + str(scan['progressive5']) + '","' 
+		#ret += str(scan['progressive6']) + '","' + str(scan['progressive7']) + '","' + str(scan['progressive8']) + '","' + str(scan['progressive9']) + '","' + str(scan['progressive10']) + '","' + str(scan['notes']) + '","' + str(scan['timestamp']) 
+		#ret += '","' + str(scan['userName']) + '","' + str(scan['location']) + '"\n'
 	return ret
 
 def _insert_to_database(uid, location, machine_id, description, progressive_count, user, progressive_titles):
@@ -419,89 +436,6 @@ def _delete_collection(coll_ref, batch_size):
 def allowed_file(filename):
 	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-'''class AsyncUploadTask(threading.Thread):
-
-	def __init__(self, uid, params):
-		threading.Thread.__init__(self)
-		self.uid = uid
-		self.params = params
-
-	def run(self):
-		#print('UID: ' + self.uid + ', Params: ' + self.params)
-
-		if not os.path.exists(UPLOAD_FOLDER):
-			os.mkdir(UPLOAD_FOLDER)
-
-		if 'file' not in self.params:
-			#return render_template('upload.html')
-			print('file not in request.files')
-			return
-		
-		f = self.params['file']
-		
-		if f.filename == '':
-			#return render_template('upload.html')
-			print('f.filename is empty')
-			return
-		
-		if f and allowed_file(f.filename):
-			filename = self.uid + '_' + secure_filename(f.filename)
-			print(UPLOAD_FOLDER)
-			print(filename)
-			f.save(os.path.join(UPLOAD_FOLDER, filename))
-
-			try:
-				file = open(UPLOAD_FOLDER + '/' + filename, 'r', encoding='utf8', errors='ignore')
-				reader = csv.reader(file)
-				_process_file(self.uid, reader)
-			except Exception as ex:
-				#flash(str(ex), 'error')
-				#return render_template('upload.html')
-				print(str(ex))
-				return
-
-			file.close()
-			f.close()
-			os.remove(UPLOAD_FOLDER + '/' + filename)
-			#flash('File uploaded successfully!', 'success')
-			#return render_template('upload.html')
-			return'''
-
-'''@copy_current_request_context
-def testUpload(uid, request_files):
-	if not os.path.exists(UPLOAD_FOLDER):
-			os.mkdir(UPLOAD_FOLDER)
-	
-	#f = request_files['file']
-	f = request_files
-	
-	if f.filename == '':
-		#return render_template('upload.html')
-		print('f.filename is empty')
-		return
-	
-	if f and allowed_file(f.filename):
-		filename = uid + '_' + secure_filename(f.filename)
-		print(UPLOAD_FOLDER)
-		print(filename)
-		f.save(os.path.join(UPLOAD_FOLDER, filename))
-
-		try:
-			file = open(UPLOAD_FOLDER + '/' + filename, 'r', encoding='utf8', errors='ignore')
-			reader = csv.reader(file)
-			_process_file(uid, reader)
-		except Exception as ex:
-			#flash(str(ex), 'error')
-			#return render_template('upload.html')
-			print(str(ex))
-			return
-
-		file.close()
-		f.close()
-		os.remove(UPLOAD_FOLDER + '/' + filename)
-		#flash('File uploaded successfully!', 'success')
-		#return render_template('upload.html')
-		return'''
 
 if __name__ == '__main__':
 	
