@@ -17,7 +17,6 @@ firebase.initializeApp(firebaseConfig);
 const btnLogout = document.getElementById("btnLogout");
 const btnDownloadReport = document.getElementById("btnDownloadReport");
 const btnSubmitNewRecord = document.getElementById("btnSubmitNewRecord");
-//const btnLoadNewRecords = document.getElementById("btnLoadNewRecords");
 
 const machine_id = document.getElementById("machine_id");
 const progressive1 = document.getElementById("progressive1");
@@ -33,13 +32,17 @@ const progressive10 = document.getElementById("progressive10");
 const notes = document.getElementById("notes");
 const user = document.getElementById("userName");
 
-//const prog1 = document.getElementById("prog1");
-
 const dataTableDiv = document.getElementById("dataTableDiv");
 const emptyStateDiv = document.getElementById("emptyStateDiv");
 
+const casino_li = document.getElementById("casino-li");
+//const admin_alert = document.getElementById("admin-alert");
+const casino_select = document.getElementById("casino-select");
+
 dataTableDiv.style.display = "none";
 emptyStateDiv.style.display = "block";
+
+//var CASINO = null;
 
 /*firebase.auth().onAuthStateChanged(firebaseUser => {
 	console.log("AuthStateChanged");
@@ -69,76 +72,38 @@ btnSubmitNewRecord.addEventListener("click", e => {
 	var forms = document.getElementsByClassName("needs-validation");
 	var validation = Array.prototype.filter.call(forms, function(form) {
 		form.addEventListener("submit", function(event) {
-			if ((form.checkValidity() === false)) {//(validate() === false)) {
-				//validate();
-				//customValidation();
+			if ((form.checkValidity() === false)) {
 				event.preventDefault();
 				event.stopPropagation();
 			}
-			//console.log(form);
 			form.classList.add('was-validated');
 		}, false);
 	});
 }, false);
 
-/*btnLoadNewRecords.addEventListener("click", e => {
-	NProgress.start();
-	$.post('/_fetch_more_records', function(data, status) {
-		for (var i = 0; i < data.length; i++) {
-			insertRow(data[i].index, 
-				data[i].machine_id, 
-				data[i].progressive_1, 
-				data[i].progressive_2, 
-				data[i].progressive_3, 
-				data[i].progressive_4, 
-				data[i].progressive_5, 
-				data[i].progressive_6, 
-				data[i].notes, 
-				data[i].timestamp, 
-				data[i].user);
+function getAccountInfo() {
+	$.post('/_send_account_info', function(data, status) {
+		if (data.isAdmin) {
+			//console.log(data.casinos);
+			for (let i = 0; i < data.casinos.length; i++) {
+				casino_select.options[casino_select.options.length] = new Option(data.casinos[i].name, data.casinos[i].uid);
+			}
+			casino_li.style.display = "block";
+			//admin_alert.style.display = "block";
+		} else {
+			casino_li.style.display = "none";
+			//admin_alert.style.display = "none";
 		}
-		NProgress.done();
 	});
-}, false);*/
-
-/*function customValidation() {
-	if (progressive_1.value.includes('$')) {
-		console.log('invalid');
-		return false;
-	} else {
-		console.log('valid');
-		return true;
-	}
 }
 
-function validate() {
-	prog1.innerHTML = "TEST";
-	console.log("VALIDATE")
-	if (isNaN(progressive1.innerHTML) || 
-		isNaN(progressive2.innerHTML) || 
-		isNaN(progressive3.innerHTML) || 
-		isNaN(progressive4.innerHTML) || 
-		isNaN(progressive5.innerHTML) || 
-		isNaN(progressive6.innerHTML)) {
-		return false;
-	} else {
-		return true;
-	}
-}*/
+getAccountInfo();
 
 function sendLogoutDataToServer(uid) {
 	var url = "/_logout";
 	var data = { 'uid' : uid };
 	$.post(url, data, function() {
 		window.location.href = "/";
-	});
-}
-
-function getDataFromServer() {
-	NProgress.start();
-	$.post('/api', function(data, status) {
-		downloadReport(data);
-		NProgress.done();
 	});
 }
 
@@ -210,32 +175,77 @@ function insertRow(index, machine_id, progressive_1, progressive_2, progressive_
 	$(dataTable).find('tbody').append(row_html);
 }
 
-function sendDateToServer(startDate, endDate) {
-	NProgress.start();
-	var url = "/_apiii";
-	var data = { 'startDate' : startDate, 'endDate' : endDate, 'timeZoneOffset' : getTimeZoneOffset() };
-	$("#tableBody").empty();
-	$.post(url, data, function(dataa) {
-		for (var i = 0; i < dataa.length; i++) {
-			insertRow(dataa[i].index, 
-				dataa[i].machine_id, 
-				dataa[i].progressive1, 
-				dataa[i].progressive2, 
-				dataa[i].progressive3, 
-				dataa[i].progressive4, 
-				dataa[i].progressive5, 
-				dataa[i].progressive6, 
-				dataa[i].progressive7, 
-				dataa[i].progressive8, 
-				dataa[i].progressive9, 
-				dataa[i].progressive10, 
-				dataa[i].notes, 
-				dataa[i].timestamp, 
-				dataa[i].userName);
-		}
-		toggleEmptyState(false)
-		NProgress.done();
-	});
+function getDataFromServer() {
+	if (casino_select.options.length == 0) {
+		NProgress.start();
+		$.post('/api', function(data, status) {
+			downloadReport(data);
+			NProgress.done();
+		});
+	} else {
+		NProgress.start();
+		var uid = { 'uid' : casino_select.options[casino_select.selectedIndex].value };
+		$.post('/api', uid, function(data) {
+			downloadReport(data);
+			NProgress.done();
+		});
+	}
+}
+
+function sendDateToServer(startDate, endDate, uid=0) {
+	if (uid == 0) { // Fetching data as a low level casino account user
+		NProgress.start();
+		var url = "/_apiii";
+		var data = { 'startDate' : startDate, 'endDate' : endDate, 'timeZoneOffset' : getTimeZoneOffset() };
+		$("#tableBody").empty();
+		$.post(url, data, function(dataa) {
+			for (var i = 0; i < dataa.length; i++) {
+				insertRow(dataa[i].index, 
+					dataa[i].machine_id, 
+					dataa[i].progressive1, 
+					dataa[i].progressive2, 
+					dataa[i].progressive3, 
+					dataa[i].progressive4, 
+					dataa[i].progressive5, 
+					dataa[i].progressive6, 
+					dataa[i].progressive7, 
+					dataa[i].progressive8, 
+					dataa[i].progressive9, 
+					dataa[i].progressive10, 
+					dataa[i].notes, 
+					dataa[i].timestamp, 
+					dataa[i].userName);
+			}
+			toggleEmptyState(false)
+			NProgress.done();
+		});
+	} else { // Fetching data as an admin to view multiple casino data
+		NProgress.start();
+		var url = "/_apiii";
+		var data = { 'startDate' : startDate, 'endDate' : endDate, 'timeZoneOffset' : getTimeZoneOffset(), 'uid' : uid };
+		$("#tableBody").empty();
+		$.post(url, data, function(dataa) {
+			for (var i = 0; i < dataa.length; i++) {
+				insertRow(dataa[i].index, 
+					dataa[i].machine_id, 
+					dataa[i].progressive1, 
+					dataa[i].progressive2, 
+					dataa[i].progressive3, 
+					dataa[i].progressive4, 
+					dataa[i].progressive5, 
+					dataa[i].progressive6, 
+					dataa[i].progressive7, 
+					dataa[i].progressive8, 
+					dataa[i].progressive9, 
+					dataa[i].progressive10, 
+					dataa[i].notes, 
+					dataa[i].timestamp, 
+					dataa[i].userName);
+			}
+			toggleEmptyState(false)
+			NProgress.done();
+		});
+	}
 }
 
 function toggleEmptyState(isEmpty) {
@@ -254,19 +264,11 @@ function getTimeZoneOffset() {
 	return d.getTimezoneOffset() / 60;
 }
 
-/*$(window).scroll(function() {
-	if($(window).scrollTop() == $(document).height() - $(window).height()) {
-		// ajax call get data from server and append to the div
-		console.log('bottom of page');
-	}
-});*/
+$("#casinos-dropdown a").click(function(e) {
+	e.preventDefault(); // cancel the link behaviour
+	var selText = $(this).text();
 
-/*function getConfigVarsFromServer() {
-	$.post('/config', function(data, status) {
-		console.log(data);
-	});
-}
-
-process.env.TEST_CONFIG_VAR = 'this-is-a-test';
-console.log(process.env.TEST_CONFIG_VAR);*/
+	$("#casinos-button").text(selText);
+	console.log(selText + ' was chosen');
+});
 

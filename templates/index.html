@@ -29,9 +29,9 @@
 		<meta name="msapplication-square310x310logo" content="mstile-310x310.png" />
 		<!-- -->
 		
-		<script src="https://www.gstatic.com/firebasejs/6.2.3/firebase-app.js"></script>
-		<script src="https://www.gstatic.com/firebasejs/6.2.3/firebase-auth.js"></script>
-		<script src="https://www.gstatic.com/firebasejs/6.2.3/firebase-firestore.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/7.14.0/firebase-app.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/7.14.0/firebase-auth.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/7.14.0/firebase-firestore.js"></script>
 
 		<script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
 		<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
@@ -44,6 +44,13 @@
 		<link href="static/styles/sticky-footer.css" rel="stylesheet">
 	</head>
 	<body>
+
+		<!--<div id="admin-alert" class="alert alert-warning alert-dismissible fade show" role="alert" style="display: none;">
+			<strong>Admin Mode:</strong> You are signed in under an admin account. To make changes we recommend signing in under an individual casino account.
+			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+		</div>-->
 
 		<!-- Navigation bar -->
 		<nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -69,6 +76,11 @@
 					</li>
 				</ul>
 				<ul class="nav navbar-nav navbar-right">
+					<li id="casino-li" style="display: none;width: 150px;">
+						<select id="casino-select" class="btn btn-secondary dropdown-toggle form-control" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							<!--<option value="0" selected="selected">Display All</option>-->
+						</select>
+					</li>
 					<li>
 						<div class="input-group mb-1">
 							<div class="input-group-prepend">
@@ -77,24 +89,6 @@
 							<input type="text" id="daterange" placeholder="Select a date range" class="form-control" autocomplete="off"/>
 						</div>
 					</li>
-					<!-- Drop down -->
-					<!--<li>
-						<div class="btn-group">
-							<button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-								<span id="selected">Choose Casino</span>
-							</button>
-							<div class="dropdown-menu">
-								<a class="dropdown-item">Soboba</a>
-								<a class="dropdown-item">Caesar's</a>
-								<a class="dropdown-item">MGM</a>
-								<a class="dropdown-item">Mandalay Bay</a>
-								<a class="dropdown-item">Bellagio</a>
-								<div class="dropdown-divider"></div>
-								<a class="dropdown-item">Display All</a>
-							</div>
-						</div>
-					</li>-->
-					<!-- End Drop down -->
 					<li>
 						<button id="btnNewRecord" type="button" class="btn btn-primary btn-me" data-toggle="modal" data-toggle="tooltip" data-placement="bottom" title="Tooltip on bottom" data-target="#myModal">New Record</button>
 					</li>
@@ -216,7 +210,7 @@
 
 		<!-- Data table -->
 		<div id="dataTableDiv" style="display: none;">
-			<table id="dataTable" class="table table-hover table-dark table-sm">
+			<table id="dataTable" class="table table-hover table-striped table-dark table-sm">
 				<thead>
 					<tr>
 						<th scope="col">#</th>
@@ -257,10 +251,11 @@
 
 		<!-- Footer -->
 		<footer class="footer">
-			<div class="container">
+			<div class="container pull-right">
 				<span class="text-muted">Meter Image Capturing</span>
 				<span class="text">2020</span>
 			</div>
+			
 		</footer>
 		<!-- -->
 
@@ -279,8 +274,13 @@
 			}, function(start, end, label) {
 				var startDate = start.format(dateFormat);
 				var endDate = end.format(dateFormat);
-				console.log('A new date selection was made: ' + startDate + ' to ' + endDate);
-				sendDateToServer(startDate, endDate);
+				//console.log('A new date selection was made: ' + startDate + ' to ' + endDate);
+				console.log('Number of options ', casino_select.options.length);
+				var uid = 0;
+				if (casino_select.options.length > 0) {
+					uid = casino_select.options[casino_select.selectedIndex].value;
+				}
+				sendDateToServer(startDate, endDate, uid);
 			});
 
 			// apply
@@ -297,12 +297,6 @@
 			$(function () {
 				$('[data-toggle="tooltip"]').tooltip()
 			})
-
-			// Drop down functionality
-			/*$('.dropdown-menu a').click(function() {
-				$('#selected').text($(this).text());
-			});*/
-			//
 		</script>
 
 		<!-- Progress bar -->

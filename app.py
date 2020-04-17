@@ -70,15 +70,40 @@ def index():
 		session.pop('endDate', None)
 		session.pop('timeZoneOffset', None)
 		return render_template('index.html')
-	#return render_template('index.html')
 
-@app.route('/signin')#, methods=["GET", "POST"])
+@app.route('/_send_account_info', methods = ['POST'])
+def _send_account_info():
+	if request.method == 'POST':
+		if ('UID' not in session):
+			return render_template('signin.html')
+		else:
+			try:
+				ret = { 'isAdmin' : True }
+				doc = db.collection('admins').document(session['UID']).get()
+				if doc.exists:
+					ret = { 'isAdmin' : True }
+					casinos = []
+					docs = db.collection('admins').document(session['UID']).collection('casinos').stream()
+					for doc in docs:
+						doc = doc.to_dict()
+						dic = {}
+						dic['name'] = doc['casino_name']
+						dic['uid'] = doc['casino_uid']
+						casinos.append(dic)
+					ret['casinos'] = casinos
+					return ret
+				else:
+					return { 'isAdmin' : False }
+			except:
+				return { 'isAdmin' : False }
+	return { 'isAdmin' : False }
+
+@app.route('/signin')
 def signin():
 	if ('UID' not in session):
 		return render_template('signin.html')
 	else:
 		return redirect(url_for('index'))
-	#return render_template('signin.html')
 
 @app.route('/account')
 def account():
@@ -108,7 +133,7 @@ def api():
 				session['email'] = user['email']
 				session['displayName'] = user['displayName']
 			return 'OK', 200
-		except: #requests.exceptions.HTTPError
+		except:
 			session.pop('UID', None)
 			return 'OK', 200
 
@@ -122,11 +147,19 @@ def _logout():
 def apii():
 	if ('UID' not in session) or ('startDate' not in session) or ('endDate' not in session) or ('timeZoneOffset' not in session):
 		return 'OK', 200
-	UID = session['UID']
-	offset = session['timeZoneOffset']
-	startDate = session['startDate']
-	endDate = session['endDate']
-	return _create_report_string(_fetchRecordsFromDatabase(UID, offset, startDate, endDate))
+	if request.method == 'POST':
+		UID = session['UID']
+		offset = session['timeZoneOffset']
+		startDate = session['startDate']
+		endDate = session['endDate']
+		print('session: ')
+		print(session)
+		print('request.form: ')
+		print(request.form)
+		if 'uid' in request.form: # Admin mode
+			return _create_report_string(_fetchRecordsFromDatabase(request.form['uid'], offset, startDate, endDate))
+		else:
+			return _create_report_string(_fetchRecordsFromDatabase(UID, offset, startDate, endDate))
 
 @app.route('/_apiii', methods = ['POST'])
 def apiii():
@@ -140,7 +173,10 @@ def apiii():
 		session['startDate'] = startDate
 		session['endDate'] = endDate
 		session['timeZoneOffset'] = offset
-		return jsonify(_fetchRecordsFromDatabase(UID, offset, startDate, endDate))
+		if 'uid' in request.form: # Admin mode
+			return jsonify(_fetchRecordsFromDatabase(request.form['uid'], offset, startDate, endDate))
+		else:
+			return jsonify(_fetchRecordsFromDatabase(UID, offset, startDate, endDate))
 
 @app.route('/upload', methods = ['GET', 'POST'])
 def upload_file():
@@ -201,6 +237,9 @@ def checkIfTempDirsExists():
 	if not os.path.exists(SERVICE_ACCOUNT_KEYS_FOLDER):
 		os.mkdir(SERVICE_ACCOUNT_KEYS_FOLDER)
 
+'''
+Returns a list of dictionaries
+'''
 def _fetchRecordsFromDatabase(UID, offset, startDate, endDate):
 	data = []
 	ref = db.collection('scans')
@@ -308,11 +347,6 @@ def _create_report_string(scans):
 		ret += progressive6 + '","' + progressive7 + '","' + progressive8 + '","' + progressive9 + '","' + progressive10 + '","' + notes + '","' + timestamp 
 		ret += '","' + userName + '","' + location + '"\n'
 
-		#ret += '"' + str(scan['machine_id']) + '","' + str(scan['progressive1']) + '","' 
-		#ret += str(scan['progressive2']) + '","' + str(scan['progressive3']) + '","' 
-		#ret += str(scan['progressive4']) + '","' + str(scan['progressive5']) + '","' 
-		#ret += str(scan['progressive6']) + '","' + str(scan['progressive7']) + '","' + str(scan['progressive8']) + '","' + str(scan['progressive9']) + '","' + str(scan['progressive10']) + '","' + str(scan['notes']) + '","' + str(scan['timestamp']) 
-		#ret += '","' + str(scan['userName']) + '","' + str(scan['location']) + '"\n'
 	return ret
 
 def _insert_to_database(uid, location, machine_id, description, progressive_count, user, progressive_titles):
@@ -352,11 +386,7 @@ def _process_file(uid, lines):
 	machineIdIndex = header.index('machine_id')
 	descriptionIndex = header.index('description')
 
-	#print('length= ' + str(len(lines)))
-
 	for line in lines:
-
-		#print(line)
 
 		if len(line) == 0:
 			break
