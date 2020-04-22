@@ -14,7 +14,7 @@ import pyrebase
 from google.cloud import storage
 import json
 
-UPLOAD_FOLDER = os.getcwd() + '/files'# + '/'
+UPLOAD_FOLDER = os.getcwd() + '/files'
 SERVICE_ACCOUNT_KEYS_FOLDER = os.getcwd() + '/service_account_keys'
 ALLOWED_EXTENSIONS = {'csv'}
 

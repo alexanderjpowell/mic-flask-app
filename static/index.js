@@ -16,6 +16,7 @@ firebase.initializeApp(firebaseConfig);
 
 const btnLogout = document.getElementById("btnLogout");
 const btnDownloadReport = document.getElementById("btnDownloadReport");
+const btnNewRecord = document.getElementById('btnNewRecord');
 const btnSubmitNewRecord = document.getElementById("btnSubmitNewRecord");
 
 const machine_id = document.getElementById("machine_id");
@@ -36,13 +37,11 @@ const dataTableDiv = document.getElementById("dataTableDiv");
 const emptyStateDiv = document.getElementById("emptyStateDiv");
 
 const casino_li = document.getElementById("casino-li");
-//const admin_alert = document.getElementById("admin-alert");
+//const adminButton = document.getElementById("admin-mode-button");
 const casino_select = document.getElementById("casino-select");
 
 dataTableDiv.style.display = "none";
 emptyStateDiv.style.display = "block";
-
-//var CASINO = null;
 
 /*firebase.auth().onAuthStateChanged(firebaseUser => {
 	console.log("AuthStateChanged");
@@ -88,8 +87,12 @@ function getAccountInfo() {
 				casino_select.options[casino_select.options.length] = new Option(data.casinos[i].name, data.casinos[i].uid);
 			}
 			casino_li.style.display = "block";
+			//adminButton.style.display = "block";
+			btnNewRecord.style.display = "none";
 		} else {
 			casino_li.style.display = "none";
+			//adminButton.style.display = "none";
+			btnNewRecord.style.display = "block";
 		}
 	});
 }
