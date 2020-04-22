@@ -63,7 +63,7 @@ DIRECTION_DESCENDING = firestore.Query.DESCENDING
 
 @app.route('/')
 def index():
-	if ('UID' not in session):
+	if ('UID' not in session) or ('email' not in session):
 		return redirect(url_for('signin'))
 	else:
 		session.pop('startDate', None)
@@ -78,22 +78,21 @@ def _send_account_info():
 			return render_template('signin.html')
 		else:
 			try:
-				ret = { 'isAdmin' : True }
-				doc = db.collection('admins').document(session['UID']).get()
-				if doc.exists:
-					ret = { 'isAdmin' : True }
-					casinos = []
-					docs = db.collection('admins').document(session['UID']).collection('casinos').stream()
-					for doc in docs:
-						doc = doc.to_dict()
-						dic = {}
-						dic['name'] = doc['casino_name']
-						dic['uid'] = doc['casino_uid']
-						casinos.append(dic)
-					ret['casinos'] = casinos
-					return ret
-				else:
-					return { 'isAdmin' : False }
+				ret = {}
+				casinos = []
+				count = 0
+				docs = db.collection('admins').document(session['email']).collection('casinos').stream()
+				for doc in docs:
+					uid = doc.id
+					doc = doc.to_dict()
+					dic = {}
+					dic['uid'] = uid
+					dic['name'] = doc['casinoName']
+					casinos.append(dic)
+					count = count + 1
+				ret['isAdmin'] = (count > 0)
+				ret['casinos'] = casinos
+				return ret
 			except:
 				return { 'isAdmin' : False }
 	return { 'isAdmin' : False }

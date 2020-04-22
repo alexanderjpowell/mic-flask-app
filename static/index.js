@@ -84,15 +84,12 @@ btnSubmitNewRecord.addEventListener("click", e => {
 function getAccountInfo() {
 	$.post('/_send_account_info', function(data, status) {
 		if (data.isAdmin) {
-			//console.log(data.casinos);
 			for (let i = 0; i < data.casinos.length; i++) {
 				casino_select.options[casino_select.options.length] = new Option(data.casinos[i].name, data.casinos[i].uid);
 			}
 			casino_li.style.display = "block";
-			//admin_alert.style.display = "block";
 		} else {
 			casino_li.style.display = "none";
-			//admin_alert.style.display = "none";
 		}
 	});
 }
