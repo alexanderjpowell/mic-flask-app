@@ -177,6 +177,13 @@ def apiii():
 		else:
 			return jsonify(_fetchRecordsFromDatabase(UID, offset, startDate, endDate))
 
+'''@app.route('/password')
+def password():
+	if ('UID' not in session):
+		return render_template('signin.html')
+	else:
+		return render_template('password.html')'''
+
 @app.route('/upload', methods = ['GET', 'POST'])
 def upload_file():
 	checkIfTempDirsExists()

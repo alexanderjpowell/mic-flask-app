@@ -156,6 +156,9 @@ function insertRow(index, machine_id, progressive_1, progressive_2, progressive_
 	if (typeof notes === 'undefined') {
 		notes = "";
 	}
+
+	let extra_headers = document.getElementById("extra-progressive-headers");
+	let table_header = document.getElementById("table-header");
 	
 	var progressive_1_row = (progressive_1.trim() === "") ? "<td>-</td>" : "<td><font color='green'>$" + progressive_1 + "</font></td>";
 	var progressive_2_row = (progressive_2.trim() === "") ? "<td>-</td>" : "<td><font color='green'>$" + progressive_2 + "</font></td>";
@@ -171,7 +174,39 @@ function insertRow(index, machine_id, progressive_1, progressive_2, progressive_
 	var notes_row = (notes.trim() === "") ? "<td>-</td>" : "<td>" + notes + "</td>";
 	var timestamp_row = "<td>" + timestamp + "</td>";
 	var user_row = "<td>" + user + "</td>";
-	var row_html = "<tr>" + index_row + machine_id_row + progressive_1_row + progressive_2_row + progressive_3_row + progressive_4_row + progressive_5_row + progressive_6_row + progressive_7_row + progressive_8_row + progressive_9_row + progressive_10_row + notes_row + timestamp_row + user_row + "</tr>";
+	var row_html = "";
+	if ((progressive_7.trim() === "") && (progressive_8.trim() === "") && (progressive_9.trim() === "") && (progressive_10.trim() === "")) {
+		row_html = "<tr>" + index_row + machine_id_row + progressive_1_row + progressive_2_row + progressive_3_row + progressive_4_row + progressive_5_row + progressive_6_row + notes_row + timestamp_row + user_row + "</tr>";
+		//extra_headers.style.display = "none";
+		table_header.innerHTML = '<th scope="col">#</th>' +
+						'<th scope="col">ID</th>' +
+						'<th scope="col">Progressive 1</th>' +
+						'<th scope="col">Progressive 2</th>' +
+						'<th scope="col">Progressive 3</th>' +
+						'<th scope="col">Progressive 4</th>' +
+						'<th scope="col">Progressive 5</th>' +
+						'<th scope="col">Progressive 6</th>' +
+						'<th scope="col">Notes</th>' +
+						'<th scope="col">Timestamp</th>' +
+						'<th scope="col">User</th>';
+	} else { // Show additional column headers
+		row_html = "<tr>" + index_row + machine_id_row + progressive_1_row + progressive_2_row + progressive_3_row + progressive_4_row + progressive_5_row + progressive_6_row + progressive_7_row + progressive_8_row + progressive_9_row + progressive_10_row + notes_row + timestamp_row + user_row + "</tr>";
+		table_header.innerHTML = '<th scope="col">#</th>' +
+						'<th scope="col">ID</th>' +
+						'<th scope="col">Progressive 1</th>' +
+						'<th scope="col">Progressive 2</th>' +
+						'<th scope="col">Progressive 3</th>' +
+						'<th scope="col">Progressive 4</th>' +
+						'<th scope="col">Progressive 5</th>' +
+						'<th scope="col">Progressive 6</th>' +
+						'<th scope="col">Progressive 7</th>' +
+						'<th scope="col">Progressive 8</th>' +
+						'<th scope="col">Progressive 9</th>' +
+						'<th scope="col">Progressive 10</th>' +
+						'<th scope="col">Notes</th>' +
+						'<th scope="col">Timestamp</th>' +
+						'<th scope="col">User</th>';
+	}
 	$(dataTable).find('tbody').append(row_html);
 }
 
