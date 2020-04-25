@@ -40,6 +40,27 @@ btnLogin.addEventListener("click", e => {
 	const pass = textPassword.value;
 	const auth = firebase.auth();
 
+	//
+	/*const promise = auth.setPersistence(firebase.auth.Auth.Persistence.local).then(function() {
+		auth.signInWithEmailAndPassword(email, pass).then(function() {
+			console.log('signed in');
+			sendDataToServer(auth.currentUser.uid, email, pass);
+		}).catch(function(error) {
+			var errorCode = error.code;
+			var errorMessage = error.message;
+			console.log("errorCode: " + errorCode);
+			console.log("errorMessage: " + errorMessage);
+			NProgress.done();
+		});
+	}).catch(function(error) {
+		var errorCode = error.code;
+		var errorMessage = error.message;
+		console.log("errorCode: " + errorCode);
+		console.log("errorMessage: " + errorMessage);
+		NProgress.done();
+	});*/
+	//
+
 	const promise = auth.signInWithEmailAndPassword(email, pass).then(function() {
 		console.log('signed in');
 		sendDataToServer(auth.currentUser.uid, email, pass);
@@ -50,7 +71,6 @@ btnLogin.addEventListener("click", e => {
 		console.log("errorMessage: " + errorMessage);
 		NProgress.done();
 	});
-	//promise.catch(e => console.log(e.message));
 });
 
 /*error codes:

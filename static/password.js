@@ -14,64 +14,68 @@ var firebaseConfig = {
 
 const emailText = document.getElementById("emailText");
 const nameText = document.getElementById("nameText");
+const changePasswordButton = document.getElementById("change-password-button");
+const cancelButton = document.getElementById("cancel-button");
+
+const alertSuccess = document.getElementById("alert-success");
+const alertError = document.getElementById("alert-error");
 
 firebase.initializeApp(firebaseConfig);
 
 var user = firebase.auth().currentUser;
 
-function changePassword() {
-				let currentpasswordinput = document.getElementById('current-password-input').value;
-				let newpasswordinput = document.getElementById('new-password-input').value;
-				let confirmpasswordinput = document.getElementById('confirm-password-input').value;
+firebase.auth().onAuthStateChanged((firebaseUser) => {
+	console.log("AuthStateChanged");
+	if (firebaseUser) {
+		console.log("User logged in: " + firebaseUser);
+		user = firebaseUser;
+	} else {
+		console.log("user not logged in");
+	}
+});
 
-				if ((currentpasswordinput == "") || (newpasswordinput == "") || (confirmpasswordinput == "")) {
-					alert('Enter all values');
-					return false;
-				}
-				if (newpasswordinput != confirmpasswordinput) {
-					alert('New passwords must match');
-					return false;
-				}
-				user.reauthenticateWithCredential(currentpasswordinput).then(function() {
-					alert('successful');
-					return false;
-				}).catch(function(error) {
-					alert(error);
-					return false;
-				});
-			}
+changePasswordButton.addEventListener("click", e => {
+	let currentpasswordinput = document.getElementById('current-password-input').value;
+	let newpasswordinput = document.getElementById('new-password-input').value;
+	let confirmpasswordinput = document.getElementById('confirm-password-input').value;
 
-/*function changePassword() {
-	let currentpasswordinput = document.changepasswordform.currentpasswordinput.value;
-	let newpasswordinput = document.changepasswordform.newpasswordinput.value;
-	let confirmpasswordinput = document.changepasswordform.confirmpasswordinput.value;
 	if ((currentpasswordinput == "") || (newpasswordinput == "") || (confirmpasswordinput == "")) {
 		alert('Enter all values');
-		return false;
+		return;
 	}
 	if (newpasswordinput != confirmpasswordinput) {
 		alert('New passwords must match');
-		return false;
+		return;
 	}
-	return true;
 
-	// Check if given password is valid
-	user.reauthenticateWithCredential(currentpasswordinput).then(function() {
-		// User re-authenticated. Now update password
-		//user.updatePassword(confirmpasswordinput).then(function() {
-			// Update successful.
-		//	return true;
-		//}).catch(function(error) {
-			// An error happened.
-		//	alert(error);
-		//	return false;
-		//});
-		alert('successful');
-		return false;
+	const credential = firebase.auth.EmailAuthProvider.credential(user.email, currentpasswordinput);
+
+	user.reauthenticateWithCredential(credential).then(function() {
+		user.updatePassword(confirmpasswordinput).then(function() {
+			//alert('password change successful');
+			alertSuccess.style.display = "block";
+			alertError.style.display = "none";
+			currentpasswordinput = "";
+			newpasswordinput = "";
+			confirmpasswordinput = "";
+		}).catch(function(error) {
+			//alert(error);
+			alertSuccess.style.display = "none";
+			alertError.style.display = "block";
+		});
 	}).catch(function(error) {
-		// An error happened.
-		alert('Incorrect Password');
-		return false;
+		alertSuccess.style.display = "none";
+		alertError.style.display = "block";
 	});
-}*/
+});
+
+function resetInputs() {
+	document.getElementById('current-password-input').value = "";
+	document.getElementById('new-password-input').value = "";
+	document.getElementById('confirm-password-input').value = "";
+}
+
+cancelButton.addEventListener("click", e => {
+	document.location.href = "/account";
+});
 

@@ -43,16 +43,30 @@ const casino_select = document.getElementById("casino-select");
 dataTableDiv.style.display = "none";
 emptyStateDiv.style.display = "block";
 
-/*firebase.auth().onAuthStateChanged(firebaseUser => {
+firebase.auth().onAuthStateChanged((firebaseUser) => {
 	console.log("AuthStateChanged");
 	if (firebaseUser) {
 		console.log("User logged in: " + firebaseUser);
 	} else {
-		console.log("user logged out");
-		sendDataToServer("");
-		window.location.href = "/";
+		console.log("user not logged in");
 	}
-});*/
+});
+
+/*function initApp() {
+	firebase.auth().onAuthStateChanged(firebaseUser => {
+		console.log("AuthStateChanged");
+		if (firebaseUser) {
+			console.log("User logged in: " + firebaseUser);
+			sendDataToServer(firebaseUser.uid);
+		} else {
+			console.log("user logged out");
+		}
+	});
+}
+
+window.onload = function() {
+	initApp();
+};*/
 
 btnLogout.addEventListener("click", e => {
 	firebase.auth().signOut().then(function() {

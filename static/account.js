@@ -19,14 +19,23 @@ firebase.initializeApp(firebaseConfig);
 
 var user = firebase.auth().currentUser;
 
-if (user != null) {
+firebase.auth().onAuthStateChanged((firebaseUser) => {
+	console.log("AuthStateChanged");
+	if (firebaseUser) {
+		console.log("User logged in: " + firebaseUser);
+	} else {
+		console.log("user not logged in");
+	}
+});
+
+/*if (user != null) {
 	console.log('email ' + user.email)
 	console.log('displayName ' + user.displayName)
 	emailText.innerHTML = user.email;
 	nameText.innerHTML = user.displayName;
 } else {
 	console.log('user is null');
-}
+}*/
 
 
 
