@@ -151,10 +151,10 @@ def apii():
 		offset = session['timeZoneOffset']
 		startDate = session['startDate']
 		endDate = session['endDate']
-		print('session: ')
-		print(session)
-		print('request.form: ')
-		print(request.form)
+		#print('session: ')
+		#print(session)
+		#print('request.form: ')
+		#print(request.form)
 		if 'uid' in request.form: # Admin mode
 			return _create_report_string(_fetchRecordsFromDatabase(request.form['uid'], offset, startDate, endDate))
 		else:

@@ -125,8 +125,20 @@ function downloadReport(csv) {
 	var hiddenElement = document.createElement('a');
 	hiddenElement.href = "data:text/csv;charset=utf-8," + encodeURI(csv);
 	hiddenElement.target = "_blank";
-	hiddenElement.download = "report.csv";
+	hiddenElement.download = createReportTitle();
 	hiddenElement.click();
+}
+
+function createReportTitle() {
+	const monthNames = [ "January", "February", "March", "April", "May", "June",
+			"July", "August", "September", "October", "November", "December" ];
+
+	var today = new Date();
+	var dd = String(today.getDate()).padStart(2, '0');
+	var MMMM = monthNames[today.getMonth()];
+	var yyyy = today.getFullYear();
+
+	return MMMM + "_" + dd + ",_" + yyyy + "_Report.csv";
 }
 
 $('.table > tbody > tr').click(function() {
