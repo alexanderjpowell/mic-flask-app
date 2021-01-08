@@ -1,322 +1,67 @@
-<!DOCTYPE html>
-<html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-		
-		<title>Meter Image Capturing</title>
+<!doctype html>
+<html lang="en" class="h-100">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.79.0">
+    <title>Cover Template · Bootstrap v5.0</title>
 
-		<!-- Favicon -->
-		<link rel="apple-touch-icon-precomposed" sizes="57x57" href="static/images/favicomatic/apple-touch-icon-57x57.png" />
-		<link rel="apple-touch-icon-precomposed" sizes="114x114" href="static/images/favicomatic/apple-touch-icon-114x114.png" />
-		<link rel="apple-touch-icon-precomposed" sizes="72x72" href="static/images/favicomatic/apple-touch-icon-72x72.png" />
-		<link rel="apple-touch-icon-precomposed" sizes="144x144" href="static/images/favicomatic/apple-touch-icon-144x144.png" />
-		<link rel="apple-touch-icon-precomposed" sizes="60x60" href="static/images/favicomatic/apple-touch-icon-60x60.png" />
-		<link rel="apple-touch-icon-precomposed" sizes="120x120" href="static/images/favicomatic/apple-touch-icon-120x120.png" />
-		<link rel="apple-touch-icon-precomposed" sizes="76x76" href="static/images/favicomatic/apple-touch-icon-76x76.png" />
-		<link rel="apple-touch-icon-precomposed" sizes="152x152" href="static/images/favicomatic/apple-touch-icon-152x152.png" />
-		<link rel="icon" type="image/png" href="static/images/favicomatic/favicon-196x196.png" sizes="196x196" />
-		<link rel="icon" type="image/png" href="static/images/favicomatic/favicon-96x96.png" sizes="96x96" />
-		<link rel="icon" type="image/png" href="static/images/favicomatic/favicon-32x32.png" sizes="32x32" />
-		<link rel="icon" type="image/png" href="static/images/favicomatic/favicon-16x16.png" sizes="16x16" />
-		<link rel="icon" type="image/png" href="static/images/favicomatic/favicon-128.png" sizes="128x128" />
-		<meta name="application-name" content="&nbsp;"/>
-		<meta name="msapplication-TileColor" content="#FFFFFF" />
-		<meta name="msapplication-TileImage" content="mstile-144x144.png" />
-		<meta name="msapplication-square70x70logo" content="mstile-70x70.png" />
-		<meta name="msapplication-square150x150logo" content="mstile-150x150.png" />
-		<meta name="msapplication-wide310x150logo" content="mstile-310x150.png" />
-		<meta name="msapplication-square310x310logo" content="mstile-310x310.png" />
-		<!-- -->
-		
-		<script src="https://www.gstatic.com/firebasejs/7.14.0/firebase-app.js"></script>
-		<script src="https://www.gstatic.com/firebasejs/7.14.0/firebase-auth.js"></script>
-		<script src="https://www.gstatic.com/firebasejs/7.14.0/firebase-firestore.js"></script>
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/cover/">
 
-		<script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
-		<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-		<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
-		<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css"/>
+    
 
-		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <!-- Bootstrap core CSS -->
+    <link href="static/assets/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!--<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">-->
 
-		<link href="static/styles/index.css" rel="stylesheet">
-		<link href="static/styles/sticky-footer.css" rel="stylesheet">
-	</head>
-	<body>
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
 
-		<!--<div id="admin-alert" class="alert alert-warning alert-dismissible fade show" role="alert" style="display: none;">
-			<strong>Admin Mode:</strong> You are signed in under an admin account. To make changes we recommend signing in under an individual casino account.
-			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-				<span aria-hidden="true">&times;</span>
-			</button>
-		</div>-->
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+    </style>
 
-		<!-- Navigation bar -->
-		<nav class="navbar navbar-expand-lg navbar-light bg-light">
-			<a class="navbar-brand">
-				<img src="static/images/logo-transparent.png" width="50" height="50" alt="">
-			</a>
-			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
-				<span class="navbar-toggler-icon"></span>
-			</button>
-			<div class="collapse navbar-collapse" id="navbarText">
-				<ul class="navbar-nav mr-auto">
-					<li class="nav-item active">
-						<a class="nav-link" href="/">Meter Image Capturing</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="/account">My Account</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="/upload">Upload</a>
-					</li>
-					<!--<li class="nav-item">
-						<a class="nav-link" href="https://capturemeters.com/" target="_blank">Contact</a>
-					</li>-->
-				</ul>
-				<ul class="nav navbar-nav navbar-right">
-					<li id="casino-li" style="display: none;width: 160px;">
-						<select id="casino-select" class="btn btn-secondary dropdown-toggle form-control" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-							<!--<option value="0" selected="selected">Display All</option>-->
-						</select>
-					</li>
-					<li>
-						<div class="input-group mb-1">
-							<div class="input-group-prepend">
-								<span class="input-group-text"><img src="static/images/round_calendar_today_black_48dp.png" width="20" height="20" alt="calendar icon"></span>
-							</div>
-							<input type="text" id="daterange" placeholder="Select a date range" class="form-control" autocomplete="off"/>
-						</div>
-					</li>
-					<li>
-						<!--<button id="btnNewRecord" type="button" class="btn btn-primary btn-me" data-toggle="modal" data-toggle="tooltip" data-placement="bottom" title="Tooltip on bottom" data-target="#myModal">New Record</button>-->
-					</li>
-					<li>
-						<button id="btnDownloadReport" type="button" class="btn">Download Report</button>
-					</li>
-					<li>
-						<button id="btnLogout" type="button" class="btn btn-outline-secondary btn-me">Sign Out</button>
-					</li>
-				</ul>
-			</div>
-		</nav>
-		<!-- end nav bar -->
+    
+    <!-- Custom styles for this template -->
+    <link href="static/styles/cover.css" rel="stylesheet">
+  </head>
+  <body class="d-flex h-100 text-center text-white bg-dark">
+    
+<div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+  <header class="mb-auto">
+    <div>
+      <h3 class="float-md-start mb-0">Meter Image Capturing</h3>
+      <nav class="nav nav-masthead justify-content-center float-md-end">
+        <a class="nav-link active" aria-current="page" href="https://capturemeters.com/">About</a>
+      </nav>
+    </div>
+  </header>
 
-		<!-- New Record Modal -->
-		<div id="myModal" class="modal fade" role="dialog">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h4 class="modal-title">Add new record</h4>
-						<button type="button" class="close" data-dismiss="modal">&times;</button>
-					</div>
-					<form action="/_add_new_record" method="post" class="needs-validation" novalidate>
-						<div class="modal-body">
-							<div class="input-group mb-3">
-								<input type="text" id="machine_id" name="machine_id" class="form-control" placeholder="Machine ID" maxlength="20" required pattern="[0-9]+">
-								<div class="invalid-feedback">Please enter a machine id with only digits.</div>
-							</div>
+  <main class="px-3">
+    <h1>We Have Moved</h1>
+    <p class="lead">Please sign into the new portal at <a href="https://www.portal.capturemeters.com">portal.capturemeters.com</a></p>
+    <p class="lead">
+      <a href="https://www.portal.capturemeters.com" class="btn btn-lg btn-secondary fw-bold border-white bg-white">Take me there</a>
+    </p>
+  </main>
 
-							<div class="input-group mb-3">
-								<div class="input-group-prepend">
-									<span class="input-group-text">$</span>
-								</div>
-								<input type="text" id="progressive1" name="progressive1" class="form-control" placeholder="Progressive 1" maxlength="10" required pattern="\d+(\.\d{1,2})?">
-								<div id="prog1" class="invalid-feedback">At least one progressive value is required. Up to 2 decimal points allowed.</div>
-							</div>
+  <footer class="mt-auto text-white-50">
+    <p>Cover template for <a href="https://getbootstrap.com/" class="text-white">Bootstrap</a>, by <a href="https://twitter.com/mdo" class="text-white">@mdo</a>.</p>
+  </footer>
+</div>
 
-							<div class="input-group mb-3">
-								<div class="input-group-prepend">
-									<span class="input-group-text">$</span>
-								</div>
-								<input type="text" id="progressive2" name="progressive2" class="form-control" placeholder="Progressive 2" maxlength="10" pattern="\d+(\.\d{1,2})?">
-							</div>
 
-							<div class="input-group mb-3">
-								<div class="input-group-prepend">
-									<span class="input-group-text">$</span>
-								</div>
-								<input type="text" id="progressive3" name="progressive3" class="form-control" placeholder="Progressive 3" maxlength="10" pattern="\d+(\.\d{1,2})?">
-							</div>
-
-							<div class="input-group mb-3">
-								<div class="input-group-prepend">
-									<span class="input-group-text">$</span>
-								</div>
-								<input type="text" id="progressive4" name="progressive4" class="form-control" placeholder="Progressive 4" maxlength="10" pattern="\d+(\.\d{1,2})?">
-							</div>
-
-							<div class="input-group mb-3">
-								<div class="input-group-prepend">
-									<span class="input-group-text">$</span>
-								</div>
-								<input type="text" id="progressive5" name="progressive5" class="form-control" placeholder="Progressive 5" maxlength="10" pattern="\d+(\.\d{1,2})?">
-							</div>
-
-							<div class="input-group mb-3">
-								<div class="input-group-prepend">
-									<span class="input-group-text">$</span>
-								</div>
-								<input type="text" id="progressive6" name="progressive6" class="form-control" placeholder="Progressive 6" maxlength="10" pattern="\d+(\.\d{1,2})?">
-							</div>
-
-							<div class="input-group mb-3">
-								<div class="input-group-prepend">
-									<span class="input-group-text">$</span>
-								</div>
-								<input type="text" id="progressive7" name="progressive7" class="form-control" placeholder="Progressive 7" maxlength="10" pattern="\d+(\.\d{1,2})?">
-							</div>
-
-							<div class="input-group mb-3">
-								<div class="input-group-prepend">
-									<span class="input-group-text">$</span>
-								</div>
-								<input type="text" id="progressive8" name="progressive8" class="form-control" placeholder="Progressive 8" maxlength="10" pattern="\d+(\.\d{1,2})?">
-							</div>
-
-							<div class="input-group mb-3">
-								<div class="input-group-prepend">
-									<span class="input-group-text">$</span>
-								</div>
-								<input type="text" id="progressive9" name="progressive9" class="form-control" placeholder="Progressive 9" maxlength="10" pattern="\d+(\.\d{1,2})?">
-							</div>
-
-							<div class="input-group mb-3">
-								<div class="input-group-prepend">
-									<span class="input-group-text">$</span>
-								</div>
-								<input type="text" id="progressive10" name="progressive10" class="form-control" placeholder="Progressive 10" maxlength="10" pattern="\d+(\.\d{1,2})?">
-							</div>
-
-							<div class="input-group mb-3">
-								<textarea id="notes" name="notes" class="form-control" placeholder="Notes" maxlength="144"></textarea>
-							</div>
-
-							<div class="input-group mb-3">
-								<input type="text" id="userName" name="userName" class="form-control" placeholder="User" maxlength="20" required pattern="[a-zA-Z0-9 ]+">
-								<div class="invalid-feedback">Please choose a username</div>
-							</div>
-						</div>
-						<div class="modal-footer">
-							<button id="btnSubmitNewRecord" type="submit" class="btn btn-default">Submit</button>
-							<!-- data-dismiss="modal" type="submit"-->
-						</div>
-					</form>
-				</div>
-			</div>
-		</div>
-		<!-- end modal -->
-
-		<!-- Data table -->
-		<div id="dataTableDiv" style="display: none;">
-			<table id="dataTable" class="table table-hover table-striped table-dark table-sm">
-				<thead>
-					<tr id="table-header">
-						<th scope="col">#</th>
-						<th scope="col">ID</th>
-						<th scope="col">Progressive 1</th>
-						<th scope="col">Progressive 2</th>
-						<th scope="col">Progressive 3</th>
-						<th scope="col">Progressive 4</th>
-						<th scope="col">Progressive 5</th>
-						<th scope="col">Progressive 6</th>
-						<!--<div id="extra-progressive-headers">
-							<th scope="col">Progressive 7</th>
-							<th scope="col">Progressive 8</th>
-							<th scope="col">Progressive 9</th>
-							<th scope="col">Progressive 10</th>
-						</div>-->
-						<th scope="col">Notes</th>
-						<th scope="col">Timestamp</th>
-						<th scope="col">User</th>
-					</tr>
-				</thead>
-				<tbody id="tableBody">
-				</tbody>
-			</table>
-			
-			<!-- Load more button -->
-			<!--<div id="divLoadNewRecords" style="padding:0 10px;">
-				<button id="btnLoadNewRecords" type="button" class="btn btn-outline-primary btn-lg btn-block">Load More Records</button>
-			</div>-->
-		</div>
-		<!-- End data table -->
-
-		<!-- Empty State -->
-		<div id="emptyStateDiv" class="text-center" style="display: block;">
-			<br><br><br><br><br>
-			<img src="static/images/google-calendar.svg" class="rounded" alt="google calendar logo" width="200" height="200"><br><br><br>
-			<h2 class="text-center">Select a date range from above to view data</h2>
-		</div>
-		<!-- -->
-
-		<!-- Footer -->
-		<footer class="footer">
-			<div class="container">
-				<div class="row">
-					<div class="col">
-						Meter Image Capturing
-					</div>
-					<div class="col"></div>
-					<div class="col"></div>
-					<!--<div class="col">
-						<button id="admin-mode-button" type="button" class="btn btn-danger" data-toggle="tooltip" data-placement="top" title="You are signed into an administrator account">Admin mode</button>
-					</div>-->
-				</div>
-			</div>
-		</footer>
-		<!-- -->
-
-		<script type="text/javascript">
-			var dateFormat = 'YYYY-MM-DD:hh:mm:A';
-			$('input[id="daterange"]').daterangepicker({
-				timePicker: true,
-				startDate: moment().startOf('hour'),
-				endDate: moment().startOf('hour'),
-				opens: 'left',
-				autoUpdateInput: false,
-				local: {
-					cancelLabel: 'Clear',
-					format: 'M/DD hh:mm A'
-				}
-			}, function(start, end, label) {
-				var startDate = start.format(dateFormat);
-				var endDate = end.format(dateFormat);
-				//console.log('A new date selection was made: ' + startDate + ' to ' + endDate);
-				console.log('Number of options ', casino_select.options.length);
-				var uid = 0;
-				if (casino_select.options.length > 0) {
-					uid = casino_select.options[casino_select.selectedIndex].value;
-				}
-				sendDateToServer(startDate, endDate, uid);
-			});
-
-			// apply
-			$('input[id="daterange"]').on('apply.daterangepicker', function(ev, picker) {
-				$(this).val(picker.startDate.format(dateFormat) + ' - ' + picker.endDate.format(dateFormat));
-			});
-
-			// cancel
-			$('input[id="daterange"]').on('cancel.daterangepicker', function(ev, picker) {
-				$(this).val('');
-			});
-
-			// Button hover text functionality
-			$(function () {
-				$('[data-toggle="tooltip"]').tooltip()
-			})
-		</script>
-
-		<!-- Progress bar -->
-		<script src='static/nprogress.js'></script>
-		<link rel='stylesheet' href='static/styles/nprogress.css'/>
-		
-		<script src="https://code.jquery.com/jquery-3.4.1.js"></script>
-	    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-	    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-	    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-	    <script type="text/javascript" src="static/index.js"></script>
-
-	</body>
+    
+  </body>
 </html>
